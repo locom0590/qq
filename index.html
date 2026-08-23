@@ -26,43 +26,43 @@ const TIERS_TAP = [
   { max: 1000,     name: "SLEEP MODE",   emoji: "💤", color: "#7C86A0", msg: "Uykuda yakalandın." },
   { max: Infinity, name: "OFFLINE",      emoji: "🔌", color: "#5A6172", msg: "Fişin çekilmiş. Yeniden bağlan." },
 ];
-// Seçimli tepki (yön) basit tepkiden ~150 ms yavaştır; sınırlar kaydırıldı
-const TIERS_TILT = [
-  { max: 300,      name: "TURBO MODE",   emoji: "⚡", color: "#FFE14D", msg: "Karar + hareket, göz açıp kapayana kadar." },
-  { max: 375,      name: "OVERCLOCKED",  emoji: "🔥", color: "#FF7A45", msg: "Bilek ve beyin senkronize. Elit." },
-  { max: 450,      name: "BOOSTED",      emoji: "🚀", color: "#4DFFB0", msg: "Hızlı karar, temiz hareket." },
-  { max: 575,      name: "ONLINE",       emoji: "✅", color: "#4DA6FF", msg: "Sistem çalışıyor. Sağlam ortalama." },
-  { max: 700,      name: "STANDBY",      emoji: "🔋", color: "#9B8CFF", msg: "Biraz düşündün, sonra hareket ettin." },
-  { max: 900,      name: "LOW BATTERY",  emoji: "🐌", color: "#C9A15A", msg: "Bilek uyanık ama beyin kahve bekliyor." },
-  { max: 1300,     name: "SLEEP MODE",   emoji: "💤", color: "#7C86A0", msg: "Ok epey bekledi seni." },
+// Seçimli tepki (yön): karar + parmak hareketi, basit dokunmadan yavaştır
+const TIERS_DIR = [
+  { max: 280,      name: "TURBO MODE",   emoji: "⚡", color: "#FFE14D", msg: "Karar + hareket, göz açıp kapayana kadar." },
+  { max: 350,      name: "OVERCLOCKED",  emoji: "🔥", color: "#FF7A45", msg: "Parmak ve beyin senkronize. Elit." },
+  { max: 425,      name: "BOOSTED",      emoji: "🚀", color: "#4DFFB0", msg: "Hızlı karar, temiz kaydırma." },
+  { max: 550,      name: "ONLINE",       emoji: "✅", color: "#4DA6FF", msg: "Sistem çalışıyor. Sağlam ortalama." },
+  { max: 675,      name: "STANDBY",      emoji: "🔋", color: "#9B8CFF", msg: "Biraz düşündün, sonra kaydırdın." },
+  { max: 875,      name: "LOW BATTERY",  emoji: "🐌", color: "#C9A15A", msg: "Parmak uyanık ama beyin kahve bekliyor." },
+  { max: 1250,     name: "SLEEP MODE",   emoji: "💤", color: "#7C86A0", msg: "Ok epey bekledi seni." },
   { max: Infinity, name: "OFFLINE",      emoji: "🔌", color: "#5A6172", msg: "Bağlantı koptu. Yeniden dene." },
 ];
-const tiersOf = (test) => test === "tap" ? TIERS_TAP : TIERS_TILT;
+const tiersOf = (test) => test === "tap" ? TIERS_TAP : TIERS_DIR;
 const tierFor = (test, ms) => tiersOf(test).find(t => ms < t.max);
 const median = (arr) => { const s=[...arr].sort((a,b)=>a-b); const m=Math.floor(s.length/2); return s.length%2 ? s[m] : Math.round((s[m-1]+s[m])/2); };
 
 const PCT = {
-  tap:  [[180,99.7],[200,99],[230,96],[250,92],[280,83],[300,74],[330,62],[360,52],[400,39],[450,26],[500,17],[600,7],[750,2],[1000,0.5]],
-  tilt: [[280,99.5],[320,97],[375,90],[420,78],[470,64],[520,52],[575,40],[650,26],[750,14],[900,6],[1100,2],[1300,0.8]],
+  tap: [[180,99.7],[200,99],[230,96],[250,92],[280,83],[300,74],[330,62],[360,52],[400,39],[450,26],[500,17],[600,7],[750,2],[1000,0.5]],
+  dir: [[260,99.5],[300,97],[350,90],[400,78],[450,64],[500,52],[550,40],[625,26],[725,14],[875,6],[1075,2],[1250,0.8]],
 };
 function percentileFaster(test, ms) {
-  const pts = PCT[test];
+  const pts = PCT[test === "tap" ? "tap" : "dir"];
   if (ms <= pts[0][0]) return pts[0][1];
   for (let i=1;i<pts.length;i++){ if(ms<=pts[i][0]){ const[a,b]=pts[i-1],[c,d]=pts[i]; return b+(d-b)*(ms-a)/(c-a);} }
   return 0.3;
 }
 
 const DIRS = {
-  left:  { arrow:"◀", label:"SOLA",   axis:"gamma", sign:-1 },
-  right: { arrow:"▶", label:"SAĞA",   axis:"gamma", sign: 1 },
-  up:    { arrow:"▲", label:"İLERİ",  axis:"beta",  sign:-1 },
-  down:  { arrow:"▼", label:"GERİYE", axis:"beta",  sign: 1 },
+  left:  { arrow:"◀", label:"SOLA" },
+  right: { arrow:"▶", label:"SAĞA" },
+  up:    { arrow:"▲", label:"YUKARI" },
+  down:  { arrow:"▼", label:"AŞAĞI" },
 };
 const DIR_KEYS = Object.keys(DIRS);
-const TILT_THRESHOLD = 16;
+const SWIPE_PX = 45;
 const OFFICIAL_N = 5;
-const TEST_NAMES = { tap: "Dokunma Refleksi", tilt: "Yön Refleksi" };
-const TEST_ICONS = { tap: "👆", tilt: "🧭" };
+const TEST_NAMES = { tap: "Dokunma Refleksi", dir: "Yön Refleksi" };
+const TEST_ICONS = { tap: "👆", dir: "🧭" };
 
 // =============== ROBOT ===============
 function RobotFace({ mood, color }) {
@@ -84,6 +84,8 @@ function RobotFace({ mood, color }) {
     sleepy: <ellipse cx="50" cy="66" rx="5" ry="7" fill={color} opacity="0.6"/>,
     error:  <path d="M38 68 q12-10 24 0" stroke={color} strokeWidth="5" fill="none" strokeLinecap="round"/>,
   };
+  const m = mouth[mood] ? mood : "idle";
+  const e = eyes[mood] ? mood : "idle";
   return (
     <svg viewBox="0 0 100 100" style={{ width:"100%", height:"100%" }}>
       <rect x="12" y="20" width="76" height="62" rx="16" fill="none" stroke={color} strokeWidth="4"/>
@@ -91,84 +93,117 @@ function RobotFace({ mood, color }) {
       <circle cx="50" cy="7" r="4" fill={color}/>
       <rect x="2" y="42" width="8" height="18" rx="4" fill={color} opacity="0.6"/>
       <rect x="90" y="42" width="8" height="18" rx="4" fill={color} opacity="0.6"/>
-      {eyes[mood]}{mouth[mouth[mood] ? mood : "idle"]}
+      {eyes[e]}{mouth[m]}
     </svg>
   );
+}
+
+// =============== SONUÇ GÖRSELİ (Instagram için PNG) ===============
+function drawCertImage(test, cert, wrong) {
+  const W = 1080, H = 1350;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const x = c.getContext("2d");
+
+  const g = x.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, "#232A52"); g.addColorStop(1, "#0D1024");
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+
+  x.strokeStyle = cert.tier.color; x.lineWidth = 10;
+  roundRect(x, 40, 40, W-80, H-80, 48); x.stroke();
+
+  x.textAlign = "center";
+  x.fillStyle = "#8EA3FF";
+  x.font = "600 34px 'Space Mono', monospace";
+  x.fillText("R E A C T O", W/2, 150);
+  x.fillStyle = "#EDEFFB";
+  x.font = "800 44px 'Bricolage Grotesque', sans-serif";
+  x.fillText(`${TEST_ICONS[test]} ${TEST_NAMES[test].toUpperCase()}`, W/2, 220);
+  x.fillStyle = "#7C86A8";
+  x.font = "400 30px 'Space Mono', monospace";
+  x.fillText("RESMİ TEST SONUCU", W/2, 270);
+
+  x.font = "120px serif";
+  x.fillText(cert.tier.emoji, W/2, 440);
+
+  x.fillStyle = cert.tier.color;
+  x.font = "700 190px 'Space Mono', monospace";
+  x.fillText(`${cert.median}`, W/2, 660);
+  x.font = "700 54px 'Space Mono', monospace";
+  x.fillText("ms  (5 denemenin medyanı)", W/2, 730);
+
+  x.font = "800 76px 'Bricolage Grotesque', sans-serif";
+  const tw = x.measureText(cert.tier.name).width;
+  x.strokeStyle = cert.tier.color; x.lineWidth = 6;
+  roundRect(x, W/2 - tw/2 - 50, 790, tw + 100, 120, 60); x.stroke();
+  x.fillText(cert.tier.name, W/2, 872);
+
+  x.fillStyle = "#8EA3FF";
+  x.font = "600 42px 'Space Mono', monospace";
+  const p = cert.pct < 1 ? cert.pct.toFixed(1) : Math.round(cert.pct);
+  x.fillText(`İnsanların %${p}'inden hızlı`, W/2, 990);
+
+  x.fillStyle = "#9AA3C8";
+  x.font = "400 36px 'Space Mono', monospace";
+  x.fillText(`Denemeler: ${cert.attempts.join("  ·  ")}`, W/2, 1070);
+  if (test === "dir" && wrong > 0) {
+    x.fillStyle = "#FF9B9B";
+    x.fillText(`Yanlış yön: ${wrong}`, W/2, 1130);
+  }
+
+  x.fillStyle = "#5A6172";
+  x.font = "400 30px 'Space Mono', monospace";
+  x.fillText("reacto — refleks testi", W/2, H - 90);
+  return c;
+}
+function roundRect(x, px, py, w, h, r) {
+  x.beginPath();
+  x.moveTo(px+r, py);
+  x.arcTo(px+w, py, px+w, py+h, r);
+  x.arcTo(px+w, py+h, px, py+h, r);
+  x.arcTo(px, py+h, px, py, r);
+  x.arcTo(px, py, px+w, py, r);
+  x.closePath();
 }
 
 const blankTestState = () => ({ history: [], best: null, official: [], wrong: 0, cert: null });
 
 function Reacto() {
-  const [screen, setScreen] = useState("gate");
-  const [checked, setChecked] = useState(false);
-  const [sensorState, setSensorState] = useState("idle"); // idle|requesting|granted|denied|nodata
-  const [simMode, setSimMode] = useState(false);
-  const [tiltNow, setTiltNow] = useState({ beta:0, gamma:0 });
-
-  const [test, setTest] = useState("tap");   // tap | tilt
+  const [test, setTest] = useState("tap");   // tap | dir
   const [mode, setMode] = useState("free");  // free | official
   const [phase, setPhase] = useState("idle");// idle|armed|go|result|early|wrong|certificate
   const [target, setTarget] = useState(null);
   const [result, setResult] = useState(null);
-  const [stats, setStats] = useState({ tap: blankTestState(), tilt: blankTestState() });
+  const [stats, setStats] = useState({ tap: blankTestState(), dir: blankTestState() });
   const [shareMsg, setShareMsg] = useState("");
+  const [imgUrl, setImgUrl] = useState(null);
 
   const timerRef = useRef(null);
   const goTimeRef = useRef(0);
-  const baselineRef = useRef({ beta:0, gamma:0 });
-  const latestRef = useRef({ beta:0, gamma:0 });
-  const dragStartRef = useRef(null);
+  const swipeStartRef = useRef(null);
+  const doneRef = useRef(false);
   const ref = useRef({});
-  ref.current = { phase, target, test, mode, stats, simMode };
+  ref.current = { phase, target, test, mode, stats };
 
   useEffect(() => () => clearTimeout(timerRef.current), []);
+  useEffect(() => () => { if (imgUrl) URL.revokeObjectURL(imgUrl); }, [imgUrl]);
 
   const S = stats[test];
   const patch = (t, updates) => setStats(s => ({ ...s, [t]: { ...s[t], ...updates } }));
 
-  // ---- Sensör ----
-  const onOrientation = useCallback((e) => {
-    if (e.beta === null || e.gamma === null) return;
-    onOrientation.seen = true;
-    latestRef.current = { beta: e.beta, gamma: e.gamma };
-    setTiltNow({ beta: e.beta, gamma: e.gamma });
-    const { phase, target, test } = ref.current;
-    if (test !== "tilt" || phase !== "go" || !target) return;
-    const base = baselineRef.current, now = latestRef.current;
-    const d = { beta: now.beta - base.beta, gamma: now.gamma - base.gamma };
-    for (const key of DIR_KEYS) {
-      const dir = DIRS[key];
-      if (d[dir.axis] * dir.sign > TILT_THRESHOLD) { registerTilt(key); return; }
-    }
-  }, []);
-
-  const enableSensor = async () => {
-    setSensorState("requesting");
-    try {
-      if (typeof DeviceOrientationEvent !== "undefined" &&
-          typeof DeviceOrientationEvent.requestPermission === "function") {
-        const res = await DeviceOrientationEvent.requestPermission();
-        if (res !== "granted") { setSensorState("denied"); return; }
-      }
-      onOrientation.seen = false;
-      window.addEventListener("deviceorientation", onOrientation);
-      setTimeout(() => setSensorState(onOrientation.seen ? "granted" : "nodata"), 1200);
-    } catch { setSensorState("denied"); }
-  };
-
-  // ---- Ortak akış ----
   const arm = useCallback(() => {
     setPhase("armed"); setResult(null); setTarget(null); setShareMsg("");
+    if (imgUrl) { URL.revokeObjectURL(imgUrl); setImgUrl(null); }
     const delay = 1300 + Math.random() * 2400;
     timerRef.current = setTimeout(() => {
-      if (ref.current.test === "tilt") {
-        baselineRef.current = { ...latestRef.current };
+      if (ref.current.test === "dir") {
         setTarget(DIR_KEYS[Math.floor(Math.random() * DIR_KEYS.length)]);
       }
+      doneRef.current = false;
       goTimeRef.current = performance.now();
       setPhase("go");
     }, delay);
-  }, []);
+  }, [imgUrl]);
 
   const recordSuccess = (ms) => {
     const { test, mode, stats } = ref.current;
@@ -191,54 +226,79 @@ function Reacto() {
     setResult(ms); setPhase("result");
   };
 
-  const registerTilt = (movedKey) => {
+  // ---- Dokunma & kaydırma (tek pad üzerinde) ----
+  const onPadDown = (e) => {
+    const { phase, test } = ref.current;
+    if (phase === "certificate") return;
+    if (phase === "idle" || phase === "result" || phase === "early" || phase === "wrong") { arm(); return; }
+    if (phase === "armed") { clearTimeout(timerRef.current); setPhase("early"); return; }
+    if (phase === "go") {
+      if (test === "tap") { recordSuccess(Math.round(performance.now() - goTimeRef.current)); }
+      else { swipeStartRef.current = { x: e.clientX, y: e.clientY }; } // yön: kaydırma başlangıcı
+    }
+  };
+  const onPadMove = (e) => {
+    const { phase, test, target } = ref.current;
+    if (test !== "dir" || phase !== "go" || !swipeStartRef.current || doneRef.current) return;
+    const dx = e.clientX - swipeStartRef.current.x;
+    const dy = e.clientY - swipeStartRef.current.y;
+    if (Math.abs(dx) < SWIPE_PX && Math.abs(dy) < SWIPE_PX) return;
+    doneRef.current = true;
+    swipeStartRef.current = null;
+    const moved = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up");
     const ms = Math.round(performance.now() - goTimeRef.current);
-    if (movedKey === ref.current.target) recordSuccess(ms);
+    if (moved === target) recordSuccess(ms);
     else { patch(ref.current.test, { wrong: ref.current.stats[ref.current.test].wrong + 1 }); setPhase("wrong"); }
   };
-
-  const handlePad = () => {
-    const p = ref.current.phase;
-    if (p === "certificate") return;
-    if (p === "idle" || p === "result" || p === "early" || p === "wrong") { arm(); return; }
-    if (ref.current.test === "tap") {
-      if (p === "armed") { clearTimeout(timerRef.current); setPhase("early"); return; }
-      if (p === "go") recordSuccess(Math.round(performance.now() - goTimeRef.current));
-    }
-    // tilt testinde go/armed sırasında dokunmak bir şey yapmaz — hareket bekleriz
-  };
-
-  // Sim modu (tilt): sürükleme = eğme
-  const onSimStart = (e) => { dragStartRef.current = { x: e.clientX, y: e.clientY }; };
-  const onSimMove = (e) => {
-    if (!ref.current.simMode || ref.current.test !== "tilt") return;
-    if (!dragStartRef.current || ref.current.phase !== "go") return;
-    const dx = e.clientX - dragStartRef.current.x, dy = e.clientY - dragStartRef.current.y;
-    if (Math.abs(dx) < 60 && Math.abs(dy) < 60) return;
-    const key = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up");
-    dragStartRef.current = null;
-    registerTilt(key);
-  };
-  const onSimEnd = () => { dragStartRef.current = null; };
+  const onPadUp = () => { swipeStartRef.current = null; };
 
   const switchTest = (t) => {
     clearTimeout(timerRef.current);
     setTest(t); setPhase("idle"); setResult(null); setTarget(null); setShareMsg("");
+    if (imgUrl) { URL.revokeObjectURL(imgUrl); setImgUrl(null); }
     if (mode === "official") patch(t, { official: [], cert: null });
   };
   const startOfficial = () => { patch(test, { official: [], cert: null, wrong: 0 }); setMode("official"); setPhase("idle"); setResult(null); setShareMsg(""); };
   const exitOfficial  = () => { setMode("free"); setPhase("idle"); setResult(null); setShareMsg(""); };
 
+  // ---- Paylaşım: metin yerine PNG görsel (Instagram bunu kabul eder) ----
   const shareCert = async () => {
     const cert = S.cert; if (!cert) return;
-    const text = `${TEST_ICONS[test]} REACTO — ${TEST_NAMES[test]} Resmi Sonucum\n${cert.tier.emoji} ${cert.tier.name} — medyan ${cert.median} ms\nİnsanların %${cert.pct < 1 ? cert.pct.toFixed(1) : Math.round(cert.pct)}'inden hızlıyım!\nDenemeler: ${cert.attempts.join(", ")} ms${test==="tilt" && S.wrong ? `\nYanlış yön: ${S.wrong}` : ""}`;
+    setShareMsg("Görsel hazırlanıyor...");
     try {
-      if (navigator.share) { await navigator.share({ text }); setShareMsg("Paylaşıldı"); }
-      else { await navigator.clipboard.writeText(text); setShareMsg("Panoya kopyalandı ✓"); }
-    } catch {
-      try { await navigator.clipboard.writeText(text); setShareMsg("Panoya kopyalandı ✓"); }
-      catch { setShareMsg("Paylaşım desteklenmiyor"); }
+      const canvas = drawCertImage(test, cert, S.wrong);
+      const blob = await new Promise(res => canvas.toBlob(res, "image/png"));
+      const file = new File([blob], "reacto-sonuc.png", { type: "image/png" });
+      const p = cert.pct < 1 ? cert.pct.toFixed(1) : Math.round(cert.pct);
+      const text = `${TEST_ICONS[test]} REACTO ${TEST_NAMES[test]} — ${cert.tier.emoji} ${cert.tier.name}, medyan ${cert.median} ms. İnsanların %${p}'inden hızlıyım!`;
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], text });
+        setShareMsg("Paylaşıldı ✓");
+      } else {
+        const url = URL.createObjectURL(blob);
+        setImgUrl(url);
+        setShareMsg("Görsel aşağıda — uzun basıp kaydet, Instagram'da paylaş");
+      }
+    } catch (err) {
+      if (err && err.name === "AbortError") { setShareMsg(""); return; }
+      try {
+        const canvas = drawCertImage(test, S.cert, S.wrong);
+        const blob = await new Promise(res => canvas.toBlob(res, "image/png"));
+        const url = URL.createObjectURL(blob);
+        setImgUrl(url);
+        setShareMsg("Görsel aşağıda — uzun basıp kaydet, Instagram'da paylaş");
+      } catch { setShareMsg("Görsel oluşturulamadı"); }
     }
+  };
+
+  const downloadImg = async () => {
+    const cert = S.cert; if (!cert) return;
+    const canvas = drawCertImage(test, cert, S.wrong);
+    const blob = await new Promise(res => canvas.toBlob(res, "image/png"));
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "reacto-sonuc.png"; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
   };
 
   const TIERS = tiersOf(test);
@@ -251,8 +311,8 @@ function Reacto() {
     phase === "armed" ? "armed" :
     phase === "go" ? "go" :
     phase === "early" || phase === "wrong" ? "error" :
-    phase === "certificate" && cert ? (cert.tier.max <= (test==="tap"?400:575) ? "happy" : cert.median < (test==="tap"?1000:1300) ? "idle" : "dizzy") :
-    tier ? (result < (test==="tap"?300:450) ? "happy" : result < (test==="tap"?650:900) ? "idle" : result < (test==="tap"?1000:1300) ? "sleepy" : "dizzy") :
+    phase === "certificate" && cert ? (cert.median < (test==="tap"?400:550) ? "happy" : cert.median < (test==="tap"?1000:1250) ? "idle" : "dizzy") :
+    tier ? (result < (test==="tap"?300:425) ? "happy" : result < (test==="tap"?650:875) ? "idle" : result < (test==="tap"?1000:1250) ? "sleepy" : "dizzy") :
     "idle";
   const faceColor =
     phase === "armed" || phase === "early" || phase === "wrong" ? "#FF5D5D" :
@@ -260,114 +320,34 @@ function Reacto() {
     phase === "certificate" && cert ? cert.tier.color :
     tier ? tier.color : "#8EA3FF";
 
-  const shell = {
-    minHeight:"100vh", background:"#0D1024", color:"#EDEFFB",
-    fontFamily:"'Bricolage Grotesque','Segoe UI',system-ui,sans-serif",
-    display:"flex", flexDirection:"column", alignItems:"center", padding:"20px 16px 32px",
-  };
-  const css = (
-    <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap');
-      @keyframes pulseGo { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
-      @keyframes blinkArm { 0%,100%{opacity:1} 50%{opacity:.55} }
-      @keyframes popIn { from{transform:scale(.8);opacity:0} to{transform:scale(1);opacity:1} }
-      @keyframes certGlow { 0%,100%{box-shadow:0 0 24px -6px var(--glow)} 50%{box-shadow:0 0 44px -4px var(--glow)} }
-      @keyframes riseIn { from{transform:translateY(14px);opacity:0} to{transform:translateY(0);opacity:1} }
-      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
-      .pad:active { transform: scale(.99); }
-      .btn { cursor:pointer; border:none; font-family:'Bricolage Grotesque',sans-serif; font-weight:700; border-radius:12px; padding:10px 16px; font-size:14px; transition: transform .08s, opacity .15s; }
-      .btn:active { transform: scale(.96); }
-      .btn:disabled { opacity:.4; cursor:not-allowed; }
-    `}</style>
-  );
-  const header = (
-    <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
-      <div style={{ width:34, height:34 }}><RobotFace mood="idle" color="#8EA3FF"/></div>
-      <div style={{ fontWeight:800, fontSize:26, letterSpacing:"0.5px" }}>
-        REACT<span style={{ color:"#8EA3FF" }}>O</span>
-      </div>
-    </div>
-  );
+  return (
+    <div style={{
+      minHeight:"100vh", background:"#0D1024", color:"#EDEFFB",
+      fontFamily:"'Bricolage Grotesque','Segoe UI',system-ui,sans-serif",
+      display:"flex", flexDirection:"column", alignItems:"center", padding:"20px 16px 32px",
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap');
+        @keyframes pulseGo { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
+        @keyframes blinkArm { 0%,100%{opacity:1} 50%{opacity:.55} }
+        @keyframes popIn { from{transform:scale(.8);opacity:0} to{transform:scale(1);opacity:1} }
+        @keyframes certGlow { 0%,100%{box-shadow:0 0 24px -6px var(--glow)} 50%{box-shadow:0 0 44px -4px var(--glow)} }
+        @keyframes riseIn { from{transform:translateY(14px);opacity:0} to{transform:translateY(0);opacity:1} }
+        @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+        .pad:active { transform: scale(.99); }
+        .btn { cursor:pointer; border:none; font-family:'Bricolage Grotesque',sans-serif; font-weight:700; border-radius:12px; padding:10px 16px; font-size:14px; transition: transform .08s, opacity .15s; }
+        .btn:active { transform: scale(.96); }
+      `}</style>
 
-  // ================= İZİN EKRANI =================
-  if (screen === "gate") {
-    const sensorOk = sensorState === "granted";
-    return (
-      <div style={shell}>
-        {css}{header}
-        <div style={{
-          width:"100%", maxWidth:420, background:"linear-gradient(160deg,#232A52,#181C3A)",
-          border:"3px solid #3A437C", borderRadius:28, padding:"28px 22px",
-          display:"flex", flexDirection:"column", gap:16, animation:"riseIn .4s ease-out",
-        }}>
-          <div style={{ fontSize:20, fontWeight:800 }}>Başlamadan önce</div>
-          <div style={{ fontSize:14, opacity:.8, lineHeight:1.5 }}>
-            Reacto iki test içerir: <b>👆 Dokunma Refleksi</b> (ekrana dokunma hızı) ve
-            <b> 🧭 Yön Refleksi</b> (telefonu okun yönüne eğme). Yön testi telefonunun
-            <b> hareket sensörünü</b> kullanır.
-          </div>
-
-          <label style={{
-            display:"flex", gap:12, alignItems:"flex-start", cursor:"pointer",
-            background:"#151935", border:`1px solid ${checked ? "#4DFFB0" : "#252B52"}`,
-            borderRadius:14, padding:"14px", transition:"border-color .2s",
-          }}>
-            <input type="checkbox" checked={checked} onChange={e=>setChecked(e.target.checked)}
-              style={{ width:20, height:20, accentColor:"#4DFFB0", marginTop:1, flexShrink:0 }}/>
-            <span style={{ fontSize:13, opacity:.85, lineHeight:1.45 }}>
-              Hareket sensörü verilerimin yalnızca test sırasında, yalnızca cihazımda kullanılacağını
-              anladım ve izin veriyorum. Veriler kaydedilmez ve hiçbir yere gönderilmez.
-            </span>
-          </label>
-
-          <button className="btn" disabled={!checked || sensorState==="requesting"} onClick={enableSensor}
-            style={{ background: sensorOk ? "#0E5A38" : "#4DFFB0", color: sensorOk ? "#B8FFD9" : "#12142B", fontSize:15 }}>
-            {sensorState==="idle" && "🧭 Sensörü Etkinleştir"}
-            {sensorState==="requesting" && "İzin bekleniyor..."}
-            {sensorState==="granted" && "✓ Sensör aktif"}
-            {sensorState==="denied" && "İzin reddedildi — tekrar dene"}
-            {sensorState==="nodata" && "Sensör verisi yok — tekrar dene"}
-          </button>
-
-          {sensorOk && (
-            <div style={{ fontFamily:"'Space Mono',monospace", fontSize:12, color:"#4DFFB0", textAlign:"center" }}>
-              Canlı eğim: β {tiltNow.beta.toFixed(0)}° / γ {tiltNow.gamma.toFixed(0)}° — telefonu oynat, sayılar değişmeli
-            </div>
-          )}
-
-          <button className="btn" disabled={!checked || !sensorOk} onClick={()=>{ setSimMode(false); setScreen("app"); }}
-            style={{ background: sensorOk && checked ? "#2A3160" : "#151935", color:"#EDEFFB", border:"1px solid #4A56A0", fontSize:15 }}>
-            ▶ Teste Geç
-          </button>
-
-          {(sensorState==="denied" || sensorState==="nodata") && (
-            <button className="btn" disabled={!checked} onClick={()=>{ setSimMode(true); setScreen("app"); }}
-              style={{ background:"transparent", color:"#8EA3FF", border:"1px dashed #3A437C", fontSize:13 }}>
-              Sensör yoksa devam et (yön testi parmakla sürükleme simülasyonuyla çalışır)
-            </button>
-          )}
-
-          <div style={{ fontSize:11, opacity:.45, lineHeight:1.4 }}>
-            iPhone'da izin penceresi açılır; sensör HTTPS gerektirir. Bu önizleme ortamında sensör
-            kısıtlıysa simülasyonla ilerleyebilirsin — gerçek ölçüm için sayfayı telefonda aç.
-          </div>
+      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+        <div style={{ width:34, height:34 }}><RobotFace mood="idle" color="#8EA3FF"/></div>
+        <div style={{ fontWeight:800, fontSize:26, letterSpacing:"0.5px" }}>
+          REACT<span style={{ color:"#8EA3FF" }}>O</span>
         </div>
       </div>
-    );
-  }
 
-  // ================= TEST EKRANI =================
-  return (
-    <div style={shell}
-      onPointerDown={simMode && test==="tilt" ? onSimStart : undefined}
-      onPointerMove={simMode && test==="tilt" ? onSimMove : undefined}
-      onPointerUp={simMode && test==="tilt" ? onSimEnd : undefined}
-    >
-      {css}{header}
-
-      {/* Test seçici */}
       <div style={{ display:"flex", gap:8, marginBottom:10 }}>
-        {["tap","tilt"].map(t => (
+        {["tap","dir"].map(t => (
           <button key={t} className="btn" onClick={()=>switchTest(t)} style={{
             background: test===t ? "#2A3160" : "#151935",
             color: test===t ? "#EDEFFB" : "#7C86A8",
@@ -376,8 +356,7 @@ function Reacto() {
         ))}
       </div>
 
-      {/* Mod seçici */}
-      <div style={{ display:"flex", gap:8, marginBottom:12, alignItems:"center" }}>
+      <div style={{ display:"flex", gap:8, marginBottom:12 }}>
         <button className="btn" onClick={exitOfficial} style={{
           background: mode==="free" ? "#2A3160" : "#151935",
           color: mode==="free" ? "#EDEFFB" : "#7C86A8",
@@ -388,7 +367,6 @@ function Reacto() {
           color: mode==="official" ? "#FFE14D" : "#7C86A8",
           border:`1px solid ${mode==="official" ? "#FFE14D" : "#252B52"}`,
         }}>🏅 Resmi Test</button>
-        {simMode && test==="tilt" && <span style={{ fontFamily:"'Space Mono',monospace", fontSize:11, color:"#8EA3FF" }}>SİM</span>}
       </div>
 
       {mode === "official" && phase !== "certificate" && (
@@ -398,7 +376,7 @@ function Reacto() {
             <div key={i} style={{ width:26, height:8, borderRadius:4,
               background: i < S.official.length ? tierFor(test, S.official[i]).color : "#252B52", transition:"background .3s" }}/>
           ))}
-          {test==="tilt" && S.wrong > 0 && <span style={{ color:"#FF9B9B" }}>✗{S.wrong}</span>}
+          {test==="dir" && S.wrong > 0 && <span style={{ color:"#FF9B9B" }}>✗{S.wrong}</span>}
         </div>
       )}
 
@@ -413,7 +391,7 @@ function Reacto() {
           <div style={{ background:"#1A1E3E", border:"1px solid #2C3462", borderRadius:10, padding:"6px 12px" }}>
             Deneme: <b>{S.history.length}</b>
           </div>
-          {test==="tilt" && (
+          {test==="dir" && (
             <div style={{ background:"#1A1E3E", border:"1px solid #2C3462", borderRadius:10, padding:"6px 12px" }}>
               Yanlış: <b style={{ color:"#FF9B9B" }}>{S.wrong}</b>
             </div>
@@ -464,14 +442,18 @@ function Reacto() {
               }}>{ms}{ms === cert.median ? " ◂" : ""}</div>
             ))}
           </div>
-          {test==="tilt" && S.wrong > 0 && (
+          {test==="dir" && S.wrong > 0 && (
             <div style={{ fontSize:12, fontFamily:"'Space Mono',monospace", color:"#FF9B9B" }}>Yanlış yön: {S.wrong} kez</div>
           )}
-          <div style={{ display:"flex", gap:10, marginTop:12 }}>
-            <button className="btn" onClick={shareCert} style={{ background:cert.tier.color, color:"#12142B" }}>📤 Sonucu Paylaş</button>
+          <div style={{ display:"flex", gap:8, marginTop:12, flexWrap:"wrap", justifyContent:"center" }}>
+            <button className="btn" onClick={shareCert} style={{ background:cert.tier.color, color:"#12142B" }}>📤 Paylaş</button>
+            <button className="btn" onClick={downloadImg} style={{ background:"#151935", color:cert.tier.color, border:`1px solid ${cert.tier.color}` }}>🖼️ Görseli İndir</button>
             <button className="btn" onClick={startOfficial} style={{ background:"#2A3160", color:"#EDEFFB", border:"1px solid #4A56A0" }}>↻ Yeni Test</button>
           </div>
-          {shareMsg && <div style={{ fontSize:12, fontFamily:"'Space Mono',monospace", color:"#4DFFB0" }}>{shareMsg}</div>}
+          {shareMsg && <div style={{ fontSize:12, fontFamily:"'Space Mono',monospace", color:"#4DFFB0", maxWidth:300 }}>{shareMsg}</div>}
+          {imgUrl && (
+            <img src={imgUrl} alt="Reacto sonuç görseli" style={{ width:"100%", maxWidth:280, borderRadius:16, border:`2px solid ${cert.tier.color}` }}/>
+          )}
           <button className="btn" onClick={exitOfficial} style={{ background:"transparent", color:"#7C86A8", fontSize:12, padding:"4px 8px" }}>
             Serbest moda dön
           </button>
@@ -479,9 +461,11 @@ function Reacto() {
       ) : (
       <div
         className="pad"
-        onPointerDown={handlePad}
+        onPointerDown={onPadDown}
+        onPointerMove={onPadMove}
+        onPointerUp={onPadUp}
         role="button" tabIndex={0}
-        onKeyDown={(e)=>{ if((e.key===" "||e.key==="Enter") && test==="tap"){ e.preventDefault(); handlePad(); }}}
+        onKeyDown={(e)=>{ if((e.key===" "||e.key==="Enter") && test==="tap"){ e.preventDefault(); onPadDown(e); }}}
         style={{
           width:"100%", maxWidth:420, minHeight:400,
           background: {
@@ -505,7 +489,7 @@ function Reacto() {
           outline:"none",
         }}
       >
-        {!(phase==="go" && test==="tilt") && (
+        {!(phase==="go" && test==="dir") && (
           <div style={{ width:100, height:100, animation: phase==="armed" ? "blinkArm 1s infinite" : phase==="result" ? "popIn .3s ease-out" : "none" }}>
             <RobotFace mood={mood} color={faceColor}/>
           </div>
@@ -519,7 +503,7 @@ function Reacto() {
             <div style={{ opacity:.75, fontSize:14, maxWidth:300 }}>
               {test==="tap"
                 ? <>Dokun ve bekle. Ekran <b style={{color:"#30E67A"}}>yeşile</b> döndüğü an tekrar dokun.</>
-                : <>Dokun, telefonu düz tut ve bekle. Ok belirdiği an telefonu <b>okun yönüne eğ</b>.{simMode && " (Sim: parmağını o yöne sürükle.)"}</>}
+                : <>Dokun ve bekle. Ok belirdiği an parmağını <b>okun yönüne kaydır</b>.</>}
               {mode==="official" && <> {OFFICIAL_N} deneme; unvanı <b>medyan</b> belirler.</>}
             </div>
             <div style={{ marginTop:8, fontFamily:"'Space Mono',monospace", fontSize:13, color: mode==="official" ? "#FFE14D" : "#8EA3FF" }}>▶ BAŞLAT</div>
@@ -528,11 +512,9 @@ function Reacto() {
 
         {phase === "armed" && (
           <>
-            <div style={{ fontSize:22, fontWeight:800, color:"#FF9B9B" }}>
-              {test==="tap" ? "Bekle..." : "Düz tut, bekle..."}
-            </div>
+            <div style={{ fontSize:22, fontWeight:800, color:"#FF9B9B" }}>Bekle...</div>
             <div style={{ opacity:.7, fontSize:13 }}>
-              {test==="tap" ? "Yeşili görmeden dokunma" : "Ok her an gelebilir"}
+              {test==="tap" ? "Yeşili görmeden dokunma" : "Ok gelmeden ekrana dokunma"}
             </div>
           </>
         )}
@@ -541,10 +523,10 @@ function Reacto() {
           <div style={{ fontSize:34, fontWeight:800, color:"#B8FFD9", letterSpacing:1 }}>DOKUN!</div>
         )}
 
-        {phase === "go" && test==="tilt" && target && (
+        {phase === "go" && test==="dir" && target && (
           <>
             <div style={{ fontSize:110, lineHeight:1, color:"#B8FFD9", animation:"popIn .12s ease-out" }}>{DIRS[target].arrow}</div>
-            <div style={{ fontSize:26, fontWeight:800, letterSpacing:3, color:"#B8FFD9" }}>{DIRS[target].label} EĞ!</div>
+            <div style={{ fontSize:26, fontWeight:800, letterSpacing:3, color:"#B8FFD9" }}>{DIRS[target].label} KAYDIR!</div>
           </>
         )}
 
