@@ -5,14 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Reacto — Refleks Testi</title>
 <meta name="theme-color" content="#0D1024">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Reacto">
+
 <style>html,body{margin:0;padding:0;background:#0D1024;}</style>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel" data-presets="react">
+<script>
+ function _optionalChain(ops) { let lastAccessLHS = undefined; let value = ops[0]; let i = 1; while (i < ops.length) { const op = ops[i]; const fn = ops[i + 1]; i += 2; if ((op === 'optionalAccess' || op === 'optionalCall') && value == null) { return undefined; } if (op === 'access' || op === 'optionalAccess') { lastAccessLHS = value; value = fn(value); } else if (op === 'call' || op === 'optionalCall') { value = fn((...args) => value.call(lastAccessLHS, ...args)); lastAccessLHS = undefined; } } return value; }
 const { useState, useRef, useEffect, useCallback } = React;
 
 // =============== ANONİM İSTATİSTİK ===============
@@ -45,10 +51,10 @@ const teamOf = (id) => TEAMS.find(t => t.id === id) || null;
 const PROFILE_KEY = "reacto.profile.v1";
 const loadProfile = () => {
   try { const raw = localStorage.getItem(PROFILE_KEY); return raw ? JSON.parse(raw) : null; }
-  catch { return null; }
+  catch (e2) { return null; }
 };
-const saveProfile = (p) => { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch {} };
-const clearProfile = () => { try { localStorage.removeItem(PROFILE_KEY); } catch {} };
+const saveProfile = (p) => { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (e3) {} };
+const clearProfile = () => { try { localStorage.removeItem(PROFILE_KEY); } catch (e4) {} };
 
 // Gönderim: yalnızca onay verilmiş + 18 yaş üstü + STATS_URL tanımlı ise.
 // Kimlik yok, çerez yok, saat yok (yalnızca gün). Hata sessizce yutulur.
@@ -67,7 +73,7 @@ const sendStats = (profile, payload) => {
     } else {
       fetch(STATS_URL, { method:"POST", headers:{ "Content-Type":"application/json" }, body, keepalive:true }).catch(()=>{});
     }
-  } catch {}
+  } catch (e5) {}
 };
 
 // =============== SEVİYELER ===============
@@ -122,32 +128,32 @@ const TEST_ICONS = { tap: "👆", tilt: "🧭" };
 // =============== ROBOT ===============
 function RobotFace({ mood, color }) {
   const eyes = {
-    idle:   <><rect x="28" y="38" width="14" height="14" rx="4" fill={color}/><rect x="58" y="38" width="14" height="14" rx="4" fill={color}/></>,
-    armed:  <><rect x="28" y="42" width="14" height="6" rx="3" fill={color}/><rect x="58" y="42" width="14" height="6" rx="3" fill={color}/></>,
-    go:     <><circle cx="35" cy="45" r="9" fill={color}/><circle cx="65" cy="45" r="9" fill={color}/></>,
-    happy:  <><path d="M28 48 q7-12 14 0" stroke={color} strokeWidth="5" fill="none" strokeLinecap="round"/><path d="M58 48 q7-12 14 0" stroke={color} strokeWidth="5" fill="none" strokeLinecap="round"/></>,
-    dizzy:  <><text x="27" y="52" fontSize="18" fill={color}>×</text><text x="57" y="52" fontSize="18" fill={color}>×</text></>,
-    sleepy: <><rect x="28" y="46" width="14" height="4" rx="2" fill={color}/><rect x="58" y="46" width="14" height="4" rx="2" fill={color}/></>,
-    error:  <><rect x="28" y="40" width="14" height="10" rx="2" fill={color} transform="rotate(12 35 45)"/><rect x="58" y="40" width="14" height="10" rx="2" fill={color} transform="rotate(-12 65 45)"/></>,
+    idle:   React.createElement(React.Fragment, null, React.createElement('rect', { x: "28", y: "38", width: "14", height: "14", rx: "4", fill: color,}), React.createElement('rect', { x: "58", y: "38", width: "14", height: "14", rx: "4", fill: color,})),
+    armed:  React.createElement(React.Fragment, null, React.createElement('rect', { x: "28", y: "42", width: "14", height: "6", rx: "3", fill: color,}), React.createElement('rect', { x: "58", y: "42", width: "14", height: "6", rx: "3", fill: color,})),
+    go:     React.createElement(React.Fragment, null, React.createElement('circle', { cx: "35", cy: "45", r: "9", fill: color,}), React.createElement('circle', { cx: "65", cy: "45", r: "9", fill: color,})),
+    happy:  React.createElement(React.Fragment, null, React.createElement('path', { d: "M28 48 q7-12 14 0"    , stroke: color, strokeWidth: "5", fill: "none", strokeLinecap: "round",}), React.createElement('path', { d: "M58 48 q7-12 14 0"    , stroke: color, strokeWidth: "5", fill: "none", strokeLinecap: "round",})),
+    dizzy:  React.createElement(React.Fragment, null, React.createElement('text', { x: "27", y: "52", fontSize: "18", fill: color,}, "×"), React.createElement('text', { x: "57", y: "52", fontSize: "18", fill: color,}, "×")),
+    sleepy: React.createElement(React.Fragment, null, React.createElement('rect', { x: "28", y: "46", width: "14", height: "4", rx: "2", fill: color,}), React.createElement('rect', { x: "58", y: "46", width: "14", height: "4", rx: "2", fill: color,})),
+    error:  React.createElement(React.Fragment, null, React.createElement('rect', { x: "28", y: "40", width: "14", height: "10", rx: "2", fill: color, transform: "rotate(12 35 45)"  ,}), React.createElement('rect', { x: "58", y: "40", width: "14", height: "10", rx: "2", fill: color, transform: "rotate(-12 65 45)"  ,})),
   };
   const mouth = {
-    idle:   <rect x="40" y="62" width="20" height="5" rx="2.5" fill={color} opacity="0.7"/>,
-    armed:  <rect x="42" y="63" width="16" height="4" rx="2" fill={color} opacity="0.7"/>,
-    go:     <circle cx="50" cy="66" r="6" fill={color} opacity="0.8"/>,
-    happy:  <path d="M38 62 q12 12 24 0" stroke={color} strokeWidth="5" fill="none" strokeLinecap="round"/>,
-    dizzy:  <path d="M38 68 q6-6 12 0 q6 6 12 0" stroke={color} strokeWidth="4" fill="none" strokeLinecap="round"/>,
-    sleepy: <ellipse cx="50" cy="66" rx="5" ry="7" fill={color} opacity="0.6"/>,
-    error:  <path d="M38 68 q12-10 24 0" stroke={color} strokeWidth="5" fill="none" strokeLinecap="round"/>,
+    idle:   React.createElement('rect', { x: "40", y: "62", width: "20", height: "5", rx: "2.5", fill: color, opacity: "0.7",}),
+    armed:  React.createElement('rect', { x: "42", y: "63", width: "16", height: "4", rx: "2", fill: color, opacity: "0.7",}),
+    go:     React.createElement('circle', { cx: "50", cy: "66", r: "6", fill: color, opacity: "0.8",}),
+    happy:  React.createElement('path', { d: "M38 62 q12 12 24 0"     , stroke: color, strokeWidth: "5", fill: "none", strokeLinecap: "round",}),
+    dizzy:  React.createElement('path', { d: "M38 68 q6-6 12 0 q6 6 12 0"        , stroke: color, strokeWidth: "4", fill: "none", strokeLinecap: "round",}),
+    sleepy: React.createElement('ellipse', { cx: "50", cy: "66", rx: "5", ry: "7", fill: color, opacity: "0.6",}),
+    error:  React.createElement('path', { d: "M38 68 q12-10 24 0"    , stroke: color, strokeWidth: "5", fill: "none", strokeLinecap: "round",}),
   };
   return (
-    <svg viewBox="0 0 100 100" style={{ width:"100%", height:"100%" }}>
-      <rect x="12" y="20" width="76" height="62" rx="16" fill="none" stroke={color} strokeWidth="4"/>
-      <line x1="50" y1="8" x2="50" y2="20" stroke={color} strokeWidth="4" strokeLinecap="round"/>
-      <circle cx="50" cy="7" r="4" fill={color}/>
-      <rect x="2" y="42" width="8" height="18" rx="4" fill={color} opacity="0.6"/>
-      <rect x="90" y="42" width="8" height="18" rx="4" fill={color} opacity="0.6"/>
-      {eyes[mood]}{mouth[mouth[mood] ? mood : "idle"]}
-    </svg>
+    React.createElement('svg', { viewBox: "0 0 100 100"   , style: { width:"100%", height:"100%" },}
+      , React.createElement('rect', { x: "12", y: "20", width: "76", height: "62", rx: "16", fill: "none", stroke: color, strokeWidth: "4",})
+      , React.createElement('line', { x1: "50", y1: "8", x2: "50", y2: "20", stroke: color, strokeWidth: "4", strokeLinecap: "round",})
+      , React.createElement('circle', { cx: "50", cy: "7", r: "4", fill: color,})
+      , React.createElement('rect', { x: "2", y: "42", width: "8", height: "18", rx: "4", fill: color, opacity: "0.6",})
+      , React.createElement('rect', { x: "90", y: "42", width: "8", height: "18", rx: "4", fill: color, opacity: "0.6",})
+      , eyes[mood], mouth[mouth[mood] ? mood : "idle"]
+    )
   );
 }
 
@@ -159,8 +165,8 @@ function Reacto() {
   const [profile, setProfile] = useState(savedProfile);
   const [screen, setScreen] = useState(profileComplete(savedProfile) ? "gate" : "onboard");
   const [obStep, setObStep] = useState("consent"); // consent | profile
-  const [selAge, setSelAge] = useState(savedProfile?.ageRange || null);
-  const [selTeam, setSelTeam] = useState(savedProfile?.team || null);
+  const [selAge, setSelAge] = useState(_optionalChain([savedProfile, 'optionalAccess', _2 => _2.ageRange]) || null);
+  const [selTeam, setSelTeam] = useState(_optionalChain([savedProfile, 'optionalAccess', _3 => _3.team]) || null);
   const [checked, setChecked] = useState(false);
   const [sensorState, setSensorState] = useState("idle"); // idle|requesting|granted|denied|nodata
   const [simMode, setSimMode] = useState(false);
@@ -214,7 +220,7 @@ function Reacto() {
       onOrientation.seen = false;
       window.addEventListener("deviceorientation", onOrientation);
       setTimeout(() => setSensorState(onOrientation.seen ? "granted" : "nodata"), 1200);
-    } catch { setSensorState("denied"); }
+    } catch (e6) { setSensorState("denied"); }
   };
 
   // ---- Ortak akış ----
@@ -291,16 +297,150 @@ function Reacto() {
   const startOfficial = () => { patch(test, { official: [], cert: null, wrong: 0 }); setMode("official"); setPhase("idle"); setResult(null); setShareMsg(""); };
   const exitOfficial  = () => { setMode("free"); setPhase("idle"); setResult(null); setShareMsg(""); };
 
+  // Sertifikayı 1080x1920 (story boyutu) PNG'ye çizer
+  const drawCertImage = (cert, myTeam) => {
+    const W = 1080, H = 1920;
+    const cv = document.createElement("canvas");
+    cv.width = W; cv.height = H;
+    const g = cv.getContext("2d");
+    const C = cert.tier.color;
+
+    // Arka plan
+    const bg = g.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, "#232A52"); bg.addColorStop(1, "#0D1024");
+    g.fillStyle = bg; g.fillRect(0, 0, W, H);
+
+    // Çerçeve
+    g.strokeStyle = C; g.lineWidth = 10;
+    const r = 60, m = 50;
+    g.beginPath();
+    g.roundRect ? g.roundRect(m, m, W - 2*m, H - 2*m, r) : g.rect(m, m, W - 2*m, H - 2*m);
+    g.stroke();
+
+    g.textAlign = "center";
+
+    // Başlık
+    g.fillStyle = "#EDEFFB";
+    g.font = "800 92px 'Bricolage Grotesque', sans-serif";
+    g.fillText("REACT", W/2 - 46, 260);
+    const w1 = g.measureText("REACT").width;
+    g.fillStyle = "#8EA3FF";
+    g.fillText("O", W/2 - 46 + w1/2 + 34, 260);
+
+    g.fillStyle = "#8EA3FF";
+    g.font = "700 34px 'Space Mono', monospace";
+    g.fillText(`${TEST_NAMES[test].toUpperCase()} — RESMİ SONUÇ`, W/2, 340);
+
+    // Robot yüzü (basitleştirilmiş)
+    const rx = W/2, ry = 620, s = 2.6;
+    g.strokeStyle = C; g.lineWidth = 12; g.lineCap = "round";
+    g.beginPath();
+    g.roundRect ? g.roundRect(rx - 38*s, ry - 31*s, 76*s, 62*s, 16*s) : g.rect(rx - 38*s, ry - 31*s, 76*s, 62*s);
+    g.stroke();
+    g.beginPath(); g.moveTo(rx, ry - 31*s); g.lineTo(rx, ry - 43*s); g.stroke();
+    g.fillStyle = C;
+    g.beginPath(); g.arc(rx, ry - 44*s, 5*s, 0, 7); g.fill();
+    // kulaklar
+    g.globalAlpha = .6;
+    g.fillRect(rx - 48*s, ry - 9*s, 8*s, 18*s);
+    g.fillRect(rx + 40*s, ry - 9*s, 8*s, 18*s);
+    g.globalAlpha = 1;
+    const fast = cert.median < (test === "tap" ? 400 : 575);
+    if (fast) {
+      // mutlu gözler + gülümseme
+      g.strokeStyle = C; g.lineWidth = 5*s;
+      g.beginPath(); g.arc(rx - 15*s, ry - 2*s, 7*s, Math.PI, 2*Math.PI); g.stroke();
+      g.beginPath(); g.arc(rx + 15*s, ry - 2*s, 7*s, Math.PI, 2*Math.PI); g.stroke();
+      g.beginPath(); g.arc(rx, ry + 12*s, 12*s, 0.15*Math.PI, 0.85*Math.PI); g.stroke();
+    } else {
+      g.fillStyle = C;
+      g.fillRect(rx - 22*s, ry - 7*s, 14*s, 14*s);
+      g.fillRect(rx + 8*s,  ry - 7*s, 14*s, 14*s);
+      g.globalAlpha = .7; g.fillRect(rx - 10*s, ry + 12*s, 20*s, 5*s); g.globalAlpha = 1;
+    }
+
+    // Medyan
+    g.fillStyle = C;
+    g.font = "700 190px 'Space Mono', monospace";
+    g.fillText(`${cert.median}`, W/2, 1080);
+    g.font = "700 60px 'Space Mono', monospace";
+    g.globalAlpha = .7; g.fillText("ms", W/2 + g.measureText(String(cert.median)).width*1.55 + 40, 1080); g.globalAlpha = 1;
+    g.fillStyle = "#9AA3C8";
+    g.font = "400 34px 'Space Mono', monospace";
+    g.fillText(`${OFFICIAL_N} denemenin medyanı`, W/2, 1140);
+
+    // Seviye rozeti
+    g.font = "800 64px 'Bricolage Grotesque', sans-serif";
+    const badge = `${cert.tier.emoji} ${cert.tier.name}`;
+    const bw = g.measureText(badge).width + 120;
+    g.strokeStyle = C; g.lineWidth = 6;
+    g.beginPath();
+    g.roundRect ? g.roundRect(W/2 - bw/2, 1210, bw, 120, 60) : g.rect(W/2 - bw/2, 1210, bw, 120);
+    g.stroke();
+    g.fillStyle = C;
+    g.fillText(badge, W/2, 1292);
+
+    // Yüzdelik
+    g.fillStyle = "#8EA3FF";
+    g.font = "700 44px 'Space Mono', monospace";
+    const p = cert.pct < 1 ? cert.pct.toFixed(1) : Math.round(cert.pct);
+    g.fillText(`İnsanların %${p}'inden hızlı`, W/2, 1440);
+
+    // Denemeler
+    g.fillStyle = "#9AA3C8";
+    g.font = "400 36px 'Space Mono', monospace";
+    g.fillText(cert.attempts.join("  ·  ") + "  ms", W/2, 1530);
+
+    // Takım
+    if (myTeam) {
+      g.fillStyle = myTeam.color;
+      g.font = "700 44px 'Space Mono', monospace";
+      g.fillText(`${myTeam.emoji} TAKIM ${myTeam.name}`, W/2, 1650);
+    }
+
+    g.fillStyle = "#5A6172";
+    g.font = "400 30px 'Space Mono', monospace";
+    g.fillText("reacto — refleks testi", W/2, 1800);
+
+    return new Promise(res => cv.toBlob(res, "image/png"));
+  };
+
   const shareCert = async () => {
     const cert = S.cert; if (!cert) return;
-    const myTeam = teamOf(profile?.team);
+    const myTeam = teamOf(_optionalChain([profile, 'optionalAccess', _4 => _4.team]));
     const text = `${TEST_ICONS[test]} REACTO — ${TEST_NAMES[test]} Resmi Sonucum${myTeam ? `\n${myTeam.emoji} Takım ${myTeam.name}` : ""}\n${cert.tier.emoji} ${cert.tier.name} — medyan ${cert.median} ms\nİnsanların %${cert.pct < 1 ? cert.pct.toFixed(1) : Math.round(cert.pct)}'inden hızlıyım!\nDenemeler: ${cert.attempts.join(", ")} ms${test==="tilt" && S.wrong ? `\nYanlış yön: ${S.wrong}` : ""}`;
+
+    // 1) Görsel olarak paylaşmayı dene (Instagram vb. yalnızca dosya kabul eder)
+    try {
+      const blob = await drawCertImage(cert, myTeam);
+      if (blob) {
+        const file = new File([blob], "reacto-sonuc.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], text });
+          setShareMsg("Paylaşıldı");
+          return;
+        }
+        // Dosya paylaşımı yoksa: görseli indir + metni panoya kopyala
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = "reacto-sonuc.png"; a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        try { await navigator.clipboard.writeText(text); } catch (e7) {}
+        setShareMsg("Görsel indirildi ✓ (metin panoda)");
+        return;
+      }
+    } catch (e) {
+      if (e && e.name === "AbortError") { setShareMsg(""); return; } // kullanıcı vazgeçti
+    }
+
+    // 2) Yedek: metin paylaşımı
     try {
       if (navigator.share) { await navigator.share({ text }); setShareMsg("Paylaşıldı"); }
       else { await navigator.clipboard.writeText(text); setShareMsg("Panoya kopyalandı ✓"); }
-    } catch {
+    } catch (e) {
+      if (e && e.name === "AbortError") { setShareMsg(""); return; }
       try { await navigator.clipboard.writeText(text); setShareMsg("Panoya kopyalandı ✓"); }
-      catch { setShareMsg("Paylaşım desteklenmiyor"); }
+      catch (e8) { setShareMsg("Paylaşım desteklenmiyor"); }
     }
   };
 
@@ -329,7 +469,7 @@ function Reacto() {
     display:"flex", flexDirection:"column", alignItems:"center", padding:"20px 16px 32px",
   };
   const css = (
-    <style>{`
+    React.createElement('style', null, `
       @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap');
       @keyframes pulseGo { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
       @keyframes blinkArm { 0%,100%{opacity:1} 50%{opacity:.55} }
@@ -341,22 +481,22 @@ function Reacto() {
       .btn { cursor:pointer; border:none; font-family:'Bricolage Grotesque',sans-serif; font-weight:700; border-radius:12px; padding:10px 16px; font-size:14px; transition: transform .08s, opacity .15s; }
       .btn:active { transform: scale(.96); }
       .btn:disabled { opacity:.4; cursor:not-allowed; }
-    `}</style>
+    `)
   );
   const header = (
-    <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
-      <div style={{ width:34, height:34 }}><RobotFace mood="idle" color="#8EA3FF"/></div>
-      <div style={{ fontWeight:800, fontSize:26, letterSpacing:"0.5px" }}>
-        REACT<span style={{ color:"#8EA3FF" }}>O</span>
-      </div>
-      {screen==="app" && teamOf(profile?.team) && (
-        <div style={{
+    React.createElement('div', { style: { display:"flex", alignItems:"center", gap:10, marginBottom:12 },}
+      , React.createElement('div', { style: { width:34, height:34 },}, React.createElement(RobotFace, { mood: "idle", color: "#8EA3FF",}))
+      , React.createElement('div', { style: { fontWeight:800, fontSize:26, letterSpacing:"0.5px" },}, "REACT"
+        , React.createElement('span', { style: { color:"#8EA3FF" },}, "O")
+      )
+      , screen==="app" && teamOf(_optionalChain([profile, 'optionalAccess', _5 => _5.team])) && (
+        React.createElement('div', { style: {
           fontFamily:"'Space Mono',monospace", fontSize:11, letterSpacing:1,
           color: teamOf(profile.team).color, border:`1px solid ${teamOf(profile.team).color}55`,
           borderRadius:999, padding:"4px 10px",
-        }}>{teamOf(profile.team).emoji} {teamOf(profile.team).name}</div>
-      )}
-    </div>
+        },}, teamOf(profile.team).emoji, " " , teamOf(profile.team).name)
+      )
+    )
   );
 
   // ================= ONBOARDING (ONAY + PROFİL) =================
@@ -368,92 +508,92 @@ function Reacto() {
     };
     if (obStep === "consent") {
       return (
-        <div style={shell}>
-          {css}{header}
-          <div style={card}>
-            <div style={{ fontSize:20, fontWeight:800 }}>Verilerin hakkında</div>
-            <div style={{ fontSize:14, opacity:.85, lineHeight:1.55 }}>
-              Reacto <b>kimlik bilgisi toplamaz</b>. İsim, e-posta, hesap veya çerez yok.
-            </div>
-            <div style={{ background:"#151935", border:"1px solid #252B52", borderRadius:14, padding:"14px", fontSize:13, opacity:.85, lineHeight:1.55 }}>
-              Onay verirsen, <b>resmi test</b> bittiğinde yalnızca şunlar anonim istatistik
-              olarak gönderilir: yaş aralığın, takımın, test tipi ve tepki sürelerin.
-              IP adresi ve tanımlayıcı hiçbir bilgi kaydedilmez. 18 yaş altı
-              seçilirse hiçbir gönderim yapılmaz.
-            </div>
-            <div style={{ fontSize:12, opacity:.55, lineHeight:1.5 }}>
-              Tercihlerin yalnızca bu cihazda saklanır; istediğin an alttaki
-              "Onayı sıfırla" bağlantısıyla değiştirebilirsin. Onay vermesen de
-              oyunu aynen oynayabilirsin.
-            </div>
-            <button className="btn" onClick={()=>{ setProfile(p=>({ ...p, consent:"accepted" })); setObStep("profile"); }}
-              style={{ background:"#4DFFB0", color:"#12142B", fontSize:15 }}>
-              ✓ Kabul ediyorum
-            </button>
-            <button className="btn" onClick={()=>{ setProfile(p=>({ ...p, consent:"declined" })); setObStep("profile"); }}
-              style={{ background:"transparent", color:"#8EA3FF", border:"1px dashed #3A437C", fontSize:13 }}>
-              İstemiyorum, sadece oyna
-            </button>
-          </div>
-        </div>
+        React.createElement('div', { style: shell,}
+          , css, header
+          , React.createElement('div', { style: card,}
+            , React.createElement('div', { style: { fontSize:20, fontWeight:800 },}, "Verilerin hakkında" )
+            , React.createElement('div', { style: { fontSize:14, opacity:.85, lineHeight:1.55 },}, "Reacto "
+               , React.createElement('b', null, "kimlik bilgisi toplamaz"  ), ". İsim, e-posta, hesap veya çerez yok."
+            )
+            , React.createElement('div', { style: { background:"#151935", border:"1px solid #252B52", borderRadius:14, padding:"14px", fontSize:13, opacity:.85, lineHeight:1.55 },}, "Onay verirsen, "
+                , React.createElement('b', null, "resmi test" ), " bittiğinde yalnızca şunlar anonim istatistik olarak gönderilir: yaş aralığın, takımın, test tipi ve tepki sürelerin. IP adresi ve tanımlayıcı hiçbir bilgi kaydedilmez. 18 yaş altı seçilirse hiçbir gönderim yapılmaz."
+
+
+
+            )
+            , React.createElement('div', { style: { fontSize:12, opacity:.55, lineHeight:1.5 },}, "Tercihlerin yalnızca bu cihazda saklanır; istediğin an alttaki \"Onayı sıfırla\" bağlantısıyla değiştirebilirsin. Onay vermesen de oyunu aynen oynayabilirsin."
+
+
+
+            )
+            , React.createElement('button', { className: "btn", onClick: ()=>{ setProfile(p=>({ ...p, consent:"accepted" })); setObStep("profile"); },
+              style: { background:"#4DFFB0", color:"#12142B", fontSize:15 },}, "✓ Kabul ediyorum"
+
+            )
+            , React.createElement('button', { className: "btn", onClick: ()=>{ setProfile(p=>({ ...p, consent:"declined" })); setObStep("profile"); },
+              style: { background:"transparent", color:"#8EA3FF", border:"1px dashed #3A437C", fontSize:13 },}, "İstemiyorum, sadece oyna"
+
+            )
+          )
+        )
       );
     }
     // obStep === "profile"
     const ready = selAge && selTeam;
     return (
-      <div style={shell}>
-        {css}{header}
-        <div style={card}>
-          <div style={{ fontSize:20, fontWeight:800 }}>Kalibrasyon</div>
+      React.createElement('div', { style: shell,}
+        , css, header
+        , React.createElement('div', { style: card,}
+          , React.createElement('div', { style: { fontSize:20, fontWeight:800 },}, "Kalibrasyon")
 
-          <div>
-            <div style={{ fontSize:12, letterSpacing:2, opacity:.55, fontFamily:"'Space Mono',monospace", marginBottom:8 }}>YAŞ ARALIĞIN</div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6 }}>
-              {AGE_RANGES.map(a=>(
-                <button key={a.id} className="btn" onClick={()=>setSelAge(a.id)} style={{
+          , React.createElement('div', null
+            , React.createElement('div', { style: { fontSize:12, letterSpacing:2, opacity:.55, fontFamily:"'Space Mono',monospace", marginBottom:8 },}, "YAŞ ARALIĞIN" )
+            , React.createElement('div', { style: { display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6 },}
+              , AGE_RANGES.map(a=>(
+                React.createElement('button', { key: a.id, className: "btn", onClick: ()=>setSelAge(a.id), style: {
                   background: selAge===a.id ? "#2A3160" : "#151935",
                   color: selAge===a.id ? "#EDEFFB" : "#7C86A8",
                   border:`1px solid ${selAge===a.id ? "#8EA3FF" : "#252B52"}`,
                   fontSize:13, padding:"9px 6px",
-                }}>{a.label}</button>
-              ))}
-            </div>
-            {selAge==="u18" && (
-              <div style={{ marginTop:8, fontSize:12, color:"#FFE14D", opacity:.85, lineHeight:1.4 }}>
-                18 yaş altındasın: oyunun tamamı açık, ancak hiçbir istatistik gönderilmez.
-              </div>
-            )}
-          </div>
+                },}, a.label)
+              ))
+            )
+            , selAge==="u18" && (
+              React.createElement('div', { style: { marginTop:8, fontSize:12, color:"#FFE14D", opacity:.85, lineHeight:1.4 },}, "18 yaş altındasın: oyunun tamamı açık, ancak hiçbir istatistik gönderilmez."
 
-          <div>
-            <div style={{ fontSize:12, letterSpacing:2, opacity:.55, fontFamily:"'Space Mono',monospace", marginBottom:8 }}>TAKIMINI SEÇ</div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-              {TEAMS.map(t=>(
-                <button key={t.id} className="btn" onClick={()=>setSelTeam(t.id)} style={{
+              )
+            )
+          )
+
+          , React.createElement('div', null
+            , React.createElement('div', { style: { fontSize:12, letterSpacing:2, opacity:.55, fontFamily:"'Space Mono',monospace", marginBottom:8 },}, "TAKIMINI SEÇ" )
+            , React.createElement('div', { style: { display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 },}
+              , TEAMS.map(t=>(
+                React.createElement('button', { key: t.id, className: "btn", onClick: ()=>setSelTeam(t.id), style: {
                   background: selTeam===t.id ? `${t.color}22` : "#151935",
                   border:`2px solid ${selTeam===t.id ? t.color : "#252B52"}`,
                   borderRadius:14, padding:"12px 8px",
                   display:"flex", flexDirection:"column", alignItems:"center", gap:3,
-                }}>
-                  <span style={{ fontSize:26, lineHeight:1 }}>{t.emoji}</span>
-                  <span style={{ fontWeight:800, letterSpacing:1.5, fontSize:14, color:t.color }}>{t.name}</span>
-                  <span style={{ fontSize:11, color:"#7C86A8" }}>{t.desc}</span>
-                </button>
-              ))}
-            </div>
-            <div style={{ marginTop:8, fontSize:11, opacity:.45, lineHeight:1.4 }}>
-              Takım seçimi eğlence ve grup istatistiği içindir; kimliğini göstermez.
-            </div>
-          </div>
+                },}
+                  , React.createElement('span', { style: { fontSize:26, lineHeight:1 },}, t.emoji)
+                  , React.createElement('span', { style: { fontWeight:800, letterSpacing:1.5, fontSize:14, color:t.color },}, t.name)
+                  , React.createElement('span', { style: { fontSize:11, color:"#7C86A8" },}, t.desc)
+                )
+              ))
+            )
+            , React.createElement('div', { style: { marginTop:8, fontSize:11, opacity:.45, lineHeight:1.4 },}, "Takım seçimi eğlence ve grup istatistiği içindir; kimliğini göstermez."
 
-          <button className="btn" disabled={!ready} onClick={()=>{
-            const p = { consent: profile?.consent || "declined", ageRange: selAge, team: selTeam };
+            )
+          )
+
+          , React.createElement('button', { className: "btn", disabled: !ready, onClick: ()=>{
+            const p = { consent: _optionalChain([profile, 'optionalAccess', _6 => _6.consent]) || "declined", ageRange: selAge, team: selTeam };
             setProfile(p); saveProfile(p); setScreen("gate");
-          }} style={{ background: ready ? "#4DFFB0" : "#151935", color: ready ? "#12142B" : "#5A6172", fontSize:15 }}>
-            {ready ? "▶ Devam" : "Yaş aralığı ve takım seç"}
-          </button>
-        </div>
-      </div>
+          }, style: { background: ready ? "#4DFFB0" : "#151935", color: ready ? "#12142B" : "#5A6172", fontSize:15 },}
+            , ready ? "▶ Devam" : "Yaş aralığı ve takım seç"
+          )
+        )
+      )
     );
   }
 
@@ -461,196 +601,196 @@ function Reacto() {
   if (screen === "gate") {
     const sensorOk = sensorState === "granted";
     return (
-      <div style={shell}>
-        {css}{header}
-        <div style={{
+      React.createElement('div', { style: shell,}
+        , css, header
+        , React.createElement('div', { style: {
           width:"100%", maxWidth:420, background:"linear-gradient(160deg,#232A52,#181C3A)",
           border:"3px solid #3A437C", borderRadius:28, padding:"28px 22px",
           display:"flex", flexDirection:"column", gap:16, animation:"riseIn .4s ease-out",
-        }}>
-          <div style={{ fontSize:20, fontWeight:800 }}>Başlamadan önce</div>
-          <div style={{ fontSize:14, opacity:.8, lineHeight:1.5 }}>
-            Reacto iki test içerir: <b>👆 Dokunma Refleksi</b> (ekrana dokunma hızı) ve
-            <b> 🧭 Yön Refleksi</b> (telefonu okun yönüne eğme). Yön testi telefonunun
-            <b> hareket sensörünü</b> kullanır.
-          </div>
+        },}
+          , React.createElement('div', { style: { fontSize:20, fontWeight:800 },}, "Başlamadan önce" )
+          , React.createElement('div', { style: { fontSize:14, opacity:.8, lineHeight:1.5 },}, "Reacto iki test içerir: "
+                , React.createElement('b', null, "👆 Dokunma Refleksi"  ), " (ekrana dokunma hızı) ve"
+            , React.createElement('b', null, " 🧭 Yön Refleksi"   ), " (telefonu okun yönüne eğme). Yön testi telefonunun"
+            , React.createElement('b', null, " hareket sensörünü"  ), " kullanır."
+          )
 
-          <label style={{
+          , React.createElement('label', { style: {
             display:"flex", gap:12, alignItems:"flex-start", cursor:"pointer",
             background:"#151935", border:`1px solid ${checked ? "#4DFFB0" : "#252B52"}`,
             borderRadius:14, padding:"14px", transition:"border-color .2s",
-          }}>
-            <input type="checkbox" checked={checked} onChange={e=>setChecked(e.target.checked)}
-              style={{ width:20, height:20, accentColor:"#4DFFB0", marginTop:1, flexShrink:0 }}/>
-            <span style={{ fontSize:13, opacity:.85, lineHeight:1.45 }}>
-              Hareket sensörü verilerimin yalnızca test sırasında, yalnızca cihazımda kullanılacağını
-              anladım ve izin veriyorum. Veriler kaydedilmez ve hiçbir yere gönderilmez.
-            </span>
-          </label>
+          },}
+            , React.createElement('input', { type: "checkbox", checked: checked, onChange: e=>setChecked(e.target.checked),
+              style: { width:20, height:20, accentColor:"#4DFFB0", marginTop:1, flexShrink:0 },})
+            , React.createElement('span', { style: { fontSize:13, opacity:.85, lineHeight:1.45 },}, "Hareket sensörü verilerimin yalnızca test sırasında, yalnızca cihazımda kullanılacağını anladım ve izin veriyorum. Veriler kaydedilmez ve hiçbir yere gönderilmez."
 
-          <button className="btn" disabled={!checked || sensorState==="requesting"} onClick={enableSensor}
-            style={{ background: sensorOk ? "#0E5A38" : "#4DFFB0", color: sensorOk ? "#B8FFD9" : "#12142B", fontSize:15 }}>
-            {sensorState==="idle" && "🧭 Sensörü Etkinleştir"}
-            {sensorState==="requesting" && "İzin bekleniyor..."}
-            {sensorState==="granted" && "✓ Sensör aktif"}
-            {sensorState==="denied" && "İzin reddedildi — tekrar dene"}
-            {sensorState==="nodata" && "Sensör verisi yok — tekrar dene"}
-          </button>
 
-          {sensorOk && (
-            <div style={{ fontFamily:"'Space Mono',monospace", fontSize:12, color:"#4DFFB0", textAlign:"center" }}>
-              Canlı eğim: β {tiltNow.beta.toFixed(0)}° / γ {tiltNow.gamma.toFixed(0)}° — telefonu oynat, sayılar değişmeli
-            </div>
-          )}
+            )
+          )
 
-          <button className="btn" disabled={!checked || !sensorOk} onClick={()=>{ setSimMode(false); setScreen("app"); }}
-            style={{ background: sensorOk && checked ? "#2A3160" : "#151935", color:"#EDEFFB", border:"1px solid #4A56A0", fontSize:15 }}>
-            ▶ Teste Geç
-          </button>
+          , React.createElement('button', { className: "btn", disabled: !checked || sensorState==="requesting", onClick: enableSensor,
+            style: { background: sensorOk ? "#0E5A38" : "#4DFFB0", color: sensorOk ? "#B8FFD9" : "#12142B", fontSize:15 },}
+            , sensorState==="idle" && "🧭 Sensörü Etkinleştir"
+            , sensorState==="requesting" && "İzin bekleniyor..."
+            , sensorState==="granted" && "✓ Sensör aktif"
+            , sensorState==="denied" && "İzin reddedildi — tekrar dene"
+            , sensorState==="nodata" && "Sensör verisi yok — tekrar dene"
+          )
 
-          {(sensorState==="denied" || sensorState==="nodata") && (
-            <button className="btn" disabled={!checked} onClick={()=>{ setSimMode(true); setScreen("app"); }}
-              style={{ background:"transparent", color:"#8EA3FF", border:"1px dashed #3A437C", fontSize:13 }}>
-              Sensör yoksa devam et (yön testi parmakla sürükleme simülasyonuyla çalışır)
-            </button>
-          )}
+          , sensorOk && (
+            React.createElement('div', { style: { fontFamily:"'Space Mono',monospace", fontSize:12, color:"#4DFFB0", textAlign:"center" },}, "Canlı eğim: β "
+                 , tiltNow.beta.toFixed(0), "° / γ "   , tiltNow.gamma.toFixed(0), "° — telefonu oynat, sayılar değişmeli"
+            )
+          )
 
-          <div style={{ fontSize:11, opacity:.45, lineHeight:1.4 }}>
-            iPhone'da izin penceresi açılır; sensör HTTPS gerektirir. Bu önizleme ortamında sensör
-            kısıtlıysa simülasyonla ilerleyebilirsin — gerçek ölçüm için sayfayı telefonda aç.
-          </div>
-        </div>
-      </div>
+          , React.createElement('button', { className: "btn", disabled: !checked || !sensorOk, onClick: ()=>{ setSimMode(false); setScreen("app"); },
+            style: { background: sensorOk && checked ? "#2A3160" : "#151935", color:"#EDEFFB", border:"1px solid #4A56A0", fontSize:15 },}, "▶ Teste Geç"
+
+          )
+
+          , (sensorState==="denied" || sensorState==="nodata") && (
+            React.createElement('button', { className: "btn", disabled: !checked, onClick: ()=>{ setSimMode(true); setScreen("app"); },
+              style: { background:"transparent", color:"#8EA3FF", border:"1px dashed #3A437C", fontSize:13 },}, "Sensör yoksa devam et (yön testi parmakla sürükleme simülasyonuyla çalışır)"
+
+            )
+          )
+
+          , React.createElement('div', { style: { fontSize:11, opacity:.45, lineHeight:1.4 },}, "iPhone'da izin penceresi açılır; sensör HTTPS gerektirir. Bu önizleme ortamında sensör kısıtlıysa simülasyonla ilerleyebilirsin — gerçek ölçüm için sayfayı telefonda aç."
+
+
+          )
+        )
+      )
     );
   }
 
   // ================= TEST EKRANI =================
   return (
-    <div style={shell}
-      onPointerDown={simMode && test==="tilt" ? onSimStart : undefined}
-      onPointerMove={simMode && test==="tilt" ? onSimMove : undefined}
-      onPointerUp={simMode && test==="tilt" ? onSimEnd : undefined}
-    >
-      {css}{header}
+    React.createElement('div', { style: shell,
+      onPointerDown: simMode && test==="tilt" ? onSimStart : undefined,
+      onPointerMove: simMode && test==="tilt" ? onSimMove : undefined,
+      onPointerUp: simMode && test==="tilt" ? onSimEnd : undefined,}
 
-      {/* Test seçici */}
-      <div style={{ display:"flex", gap:8, marginBottom:10 }}>
-        {["tap","tilt"].map(t => (
-          <button key={t} className="btn" onClick={()=>switchTest(t)} style={{
+      , css, header
+
+      /* Test seçici */
+      , React.createElement('div', { style: { display:"flex", gap:8, marginBottom:10 },}
+        , ["tap","tilt"].map(t => (
+          React.createElement('button', { key: t, className: "btn", onClick: ()=>switchTest(t), style: {
             background: test===t ? "#2A3160" : "#151935",
             color: test===t ? "#EDEFFB" : "#7C86A8",
             border:`1px solid ${test===t ? "#8EA3FF" : "#252B52"}`,
-          }}>{TEST_ICONS[t]} {TEST_NAMES[t]}</button>
-        ))}
-      </div>
+          },}, TEST_ICONS[t], " " , TEST_NAMES[t])
+        ))
+      )
 
-      {/* Mod seçici */}
-      <div style={{ display:"flex", gap:8, marginBottom:12, alignItems:"center" }}>
-        <button className="btn" onClick={exitOfficial} style={{
+      /* Mod seçici */
+      , React.createElement('div', { style: { display:"flex", gap:8, marginBottom:12, alignItems:"center" },}
+        , React.createElement('button', { className: "btn", onClick: exitOfficial, style: {
           background: mode==="free" ? "#2A3160" : "#151935",
           color: mode==="free" ? "#EDEFFB" : "#7C86A8",
           border:`1px solid ${mode==="free" ? "#4A56A0" : "#252B52"}`,
-        }}>Serbest</button>
-        <button className="btn" onClick={startOfficial} style={{
+        },}, "Serbest")
+        , React.createElement('button', { className: "btn", onClick: startOfficial, style: {
           background: mode==="official" ? "#4A3A10" : "#151935",
           color: mode==="official" ? "#FFE14D" : "#7C86A8",
           border:`1px solid ${mode==="official" ? "#FFE14D" : "#252B52"}`,
-        }}>🏅 Resmi Test</button>
-        {simMode && test==="tilt" && <span style={{ fontFamily:"'Space Mono',monospace", fontSize:11, color:"#8EA3FF" }}>SİM</span>}
-      </div>
+        },}, "🏅 Resmi Test"  )
+        , simMode && test==="tilt" && React.createElement('span', { style: { fontFamily:"'Space Mono',monospace", fontSize:11, color:"#8EA3FF" },}, "SİM")
+      )
 
-      {mode === "official" && phase !== "certificate" && (
-        <div style={{ display:"flex", gap:6, alignItems:"center", marginBottom:12, fontFamily:"'Space Mono',monospace", fontSize:12 }}>
-          <span style={{ color:"#FFE14D" }}>Deneme {Math.min(S.official.length+1, OFFICIAL_N)}/{OFFICIAL_N}</span>
-          {Array.from({length:OFFICIAL_N}).map((_,i)=>(
-            <div key={i} style={{ width:26, height:8, borderRadius:4,
-              background: i < S.official.length ? tierFor(test, S.official[i]).color : "#252B52", transition:"background .3s" }}/>
-          ))}
-          {test==="tilt" && S.wrong > 0 && <span style={{ color:"#FF9B9B" }}>✗{S.wrong}</span>}
-        </div>
-      )}
+      , mode === "official" && phase !== "certificate" && (
+        React.createElement('div', { style: { display:"flex", gap:6, alignItems:"center", marginBottom:12, fontFamily:"'Space Mono',monospace", fontSize:12 },}
+          , React.createElement('span', { style: { color:"#FFE14D" },}, "Deneme " , Math.min(S.official.length+1, OFFICIAL_N), "/", OFFICIAL_N)
+          , Array.from({length:OFFICIAL_N}).map((_,i)=>(
+            React.createElement('div', { key: i, style: { width:26, height:8, borderRadius:4,
+              background: i < S.official.length ? tierFor(test, S.official[i]).color : "#252B52", transition:"background .3s" },})
+          ))
+          , test==="tilt" && S.wrong > 0 && React.createElement('span', { style: { color:"#FF9B9B" },}, "✗", S.wrong)
+        )
+      )
 
-      {mode === "free" && (
-        <div style={{ display:"flex", gap:8, marginBottom:12, fontFamily:"'Space Mono',monospace", fontSize:12, flexWrap:"wrap", justifyContent:"center" }}>
-          <div style={{ background:"#1A1E3E", border:"1px solid #2C3462", borderRadius:10, padding:"6px 12px" }}>
-            En iyi: <b style={{ color:"#FFE14D" }}>{S.best !== null ? S.best+" ms" : "—"}</b>
-          </div>
-          <div style={{ background:"#1A1E3E", border:"1px solid #2C3462", borderRadius:10, padding:"6px 12px" }}>
-            Ortalama: <b style={{ color:"#8EA3FF" }}>{avg !== null ? avg+" ms" : "—"}</b>
-          </div>
-          <div style={{ background:"#1A1E3E", border:"1px solid #2C3462", borderRadius:10, padding:"6px 12px" }}>
-            Deneme: <b>{S.history.length}</b>
-          </div>
-          {test==="tilt" && (
-            <div style={{ background:"#1A1E3E", border:"1px solid #2C3462", borderRadius:10, padding:"6px 12px" }}>
-              Yanlış: <b style={{ color:"#FF9B9B" }}>{S.wrong}</b>
-            </div>
-          )}
-        </div>
-      )}
+      , mode === "free" && (
+        React.createElement('div', { style: { display:"flex", gap:8, marginBottom:12, fontFamily:"'Space Mono',monospace", fontSize:12, flexWrap:"wrap", justifyContent:"center" },}
+          , React.createElement('div', { style: { background:"#1A1E3E", border:"1px solid #2C3462", borderRadius:10, padding:"6px 12px" },}, "En iyi: "
+              , React.createElement('b', { style: { color:"#FFE14D" },}, S.best !== null ? S.best+" ms" : "—")
+          )
+          , React.createElement('div', { style: { background:"#1A1E3E", border:"1px solid #2C3462", borderRadius:10, padding:"6px 12px" },}, "Ortalama: "
+             , React.createElement('b', { style: { color:"#8EA3FF" },}, avg !== null ? avg+" ms" : "—")
+          )
+          , React.createElement('div', { style: { background:"#1A1E3E", border:"1px solid #2C3462", borderRadius:10, padding:"6px 12px" },}, "Deneme: "
+             , React.createElement('b', null, S.history.length)
+          )
+          , test==="tilt" && (
+            React.createElement('div', { style: { background:"#1A1E3E", border:"1px solid #2C3462", borderRadius:10, padding:"6px 12px" },}, "Yanlış: "
+               , React.createElement('b', { style: { color:"#FF9B9B" },}, S.wrong)
+            )
+          )
+        )
+      )
 
-      {phase === "certificate" && cert ? (
-        <div style={{
+      , phase === "certificate" && cert ? (
+        React.createElement('div', { style: {
           width:"100%", maxWidth:420, borderRadius:28, padding:"30px 22px",
           background:"linear-gradient(160deg,#232A52,#181C3A)",
           border:`3px solid ${cert.tier.color}`,
           display:"flex", flexDirection:"column", alignItems:"center", gap:10, textAlign:"center",
           "--glow": cert.tier.color + "66",
           animation:"riseIn .4s ease-out, certGlow 2.4s infinite",
-        }}>
-          <div style={{ fontFamily:"'Space Mono',monospace", fontSize:11, letterSpacing:3, color:"#8EA3FF" }}>
-            {TEST_ICONS[test]} {TEST_NAMES[test].toUpperCase()} — RESMİ SONUÇ
-          </div>
-          <div style={{ width:96, height:96, animation:"popIn .4s .1s ease-out both" }}>
-            <RobotFace mood={mood} color={cert.tier.color}/>
-          </div>
-          <div style={{ fontFamily:"'Space Mono',monospace", fontSize:56, fontWeight:700, lineHeight:1, color:cert.tier.color, animation:"popIn .35s .2s ease-out both" }}>
-            {cert.median}<span style={{ fontSize:20, opacity:.7 }}> ms</span>
-          </div>
-          <div style={{ fontSize:11, fontFamily:"'Space Mono',monospace", opacity:.55, marginTop:-4 }}>
-            {OFFICIAL_N} denemenin medyanı
-          </div>
-          <div style={{
+        },}
+          , React.createElement('div', { style: { fontFamily:"'Space Mono',monospace", fontSize:11, letterSpacing:3, color:"#8EA3FF" },}
+            , TEST_ICONS[test], " " , TEST_NAMES[test].toUpperCase(), " — RESMİ SONUÇ"
+          )
+          , React.createElement('div', { style: { width:96, height:96, animation:"popIn .4s .1s ease-out both" },}
+            , React.createElement(RobotFace, { mood: mood, color: cert.tier.color,})
+          )
+          , React.createElement('div', { style: { fontFamily:"'Space Mono',monospace", fontSize:56, fontWeight:700, lineHeight:1, color:cert.tier.color, animation:"popIn .35s .2s ease-out both" },}
+            , cert.median, React.createElement('span', { style: { fontSize:20, opacity:.7 },}, " ms" )
+          )
+          , React.createElement('div', { style: { fontSize:11, fontFamily:"'Space Mono',monospace", opacity:.55, marginTop:-4 },}
+            , OFFICIAL_N, " denemenin medyanı"
+          )
+          , React.createElement('div', { style: {
             fontSize:22, fontWeight:800, letterSpacing:2, color:cert.tier.color,
             border:`2px solid ${cert.tier.color}`, borderRadius:999, padding:"8px 22px",
             animation:"popIn .35s .35s ease-out both",
-          }}>
-            {cert.tier.emoji} {cert.tier.name}
-          </div>
-          <div style={{ opacity:.85, fontSize:14, maxWidth:290 }}>{cert.tier.msg}</div>
-          <div style={{ fontFamily:"'Space Mono',monospace", fontSize:13, color:"#8EA3FF" }}>
-            İnsanların %{cert.pct < 1 ? cert.pct.toFixed(1) : Math.round(cert.pct)}'inden hızlısın
-          </div>
-          <div style={{ display:"flex", gap:6, flexWrap:"wrap", justifyContent:"center", marginTop:4 }}>
-            {cert.attempts.map((ms,i)=>(
-              <div key={i} style={{
+          },}
+            , cert.tier.emoji, " " , cert.tier.name
+          )
+          , React.createElement('div', { style: { opacity:.85, fontSize:14, maxWidth:290 },}, cert.tier.msg)
+          , React.createElement('div', { style: { fontFamily:"'Space Mono',monospace", fontSize:13, color:"#8EA3FF" },}, "İnsanların %"
+             , cert.pct < 1 ? cert.pct.toFixed(1) : Math.round(cert.pct), "'inden hızlısın"
+          )
+          , React.createElement('div', { style: { display:"flex", gap:6, flexWrap:"wrap", justifyContent:"center", marginTop:4 },}
+            , cert.attempts.map((ms,i)=>(
+              React.createElement('div', { key: i, style: {
                 fontFamily:"'Space Mono',monospace", fontSize:12,
                 background:"#151935", border:`1px solid ${tierFor(test, ms).color}55`,
                 color: ms === cert.median ? cert.tier.color : "#9AA3C8",
                 fontWeight: ms === cert.median ? 700 : 400,
                 borderRadius:8, padding:"4px 9px",
-              }}>{ms}{ms === cert.median ? " ◂" : ""}</div>
-            ))}
-          </div>
-          {test==="tilt" && S.wrong > 0 && (
-            <div style={{ fontSize:12, fontFamily:"'Space Mono',monospace", color:"#FF9B9B" }}>Yanlış yön: {S.wrong} kez</div>
-          )}
-          <div style={{ display:"flex", gap:10, marginTop:12 }}>
-            <button className="btn" onClick={shareCert} style={{ background:cert.tier.color, color:"#12142B" }}>📤 Sonucu Paylaş</button>
-            <button className="btn" onClick={startOfficial} style={{ background:"#2A3160", color:"#EDEFFB", border:"1px solid #4A56A0" }}>↻ Yeni Test</button>
-          </div>
-          {shareMsg && <div style={{ fontSize:12, fontFamily:"'Space Mono',monospace", color:"#4DFFB0" }}>{shareMsg}</div>}
-          <button className="btn" onClick={exitOfficial} style={{ background:"transparent", color:"#7C86A8", fontSize:12, padding:"4px 8px" }}>
-            Serbest moda dön
-          </button>
-        </div>
+              },}, ms, ms === cert.median ? " ◂" : "")
+            ))
+          )
+          , test==="tilt" && S.wrong > 0 && (
+            React.createElement('div', { style: { fontSize:12, fontFamily:"'Space Mono',monospace", color:"#FF9B9B" },}, "Yanlış yön: "  , S.wrong, " kez" )
+          )
+          , React.createElement('div', { style: { display:"flex", gap:10, marginTop:12 },}
+            , React.createElement('button', { className: "btn", onClick: shareCert, style: { background:cert.tier.color, color:"#12142B" },}, "📤 Sonucu Paylaş"  )
+            , React.createElement('button', { className: "btn", onClick: startOfficial, style: { background:"#2A3160", color:"#EDEFFB", border:"1px solid #4A56A0" },}, "↻ Yeni Test"  )
+          )
+          , shareMsg && React.createElement('div', { style: { fontSize:12, fontFamily:"'Space Mono',monospace", color:"#4DFFB0" },}, shareMsg)
+          , React.createElement('button', { className: "btn", onClick: exitOfficial, style: { background:"transparent", color:"#7C86A8", fontSize:12, padding:"4px 8px" },}, "Serbest moda dön"
+
+          )
+        )
       ) : (
-      <div
-        className="pad"
-        onPointerDown={handlePad}
-        role="button" tabIndex={0}
-        onKeyDown={(e)=>{ if((e.key===" "||e.key==="Enter") && test==="tap"){ e.preventDefault(); handlePad(); }}}
-        style={{
+      React.createElement('div', {
+        className: "pad",
+        onPointerDown: handlePad,
+        role: "button", tabIndex: 0,
+        onKeyDown: (e)=>{ if((e.key===" "||e.key==="Enter") && test==="tap"){ e.preventDefault(); handlePad(); }},
+        style: {
           width:"100%", maxWidth:420, minHeight:400,
           background: {
             idle:"linear-gradient(160deg,#232A52,#181C3A)",
@@ -671,145 +811,153 @@ function Reacto() {
           transition:"background .2s, border-color .2s",
           animation: phase==="go" ? "pulseGo .5s infinite" : "none",
           outline:"none",
-        }}
-      >
-        {!(phase==="go" && test==="tilt") && (
-          <div style={{ width:100, height:100, animation: phase==="armed" ? "blinkArm 1s infinite" : phase==="result" ? "popIn .3s ease-out" : "none" }}>
-            <RobotFace mood={mood} color={faceColor}/>
-          </div>
-        )}
+        },}
 
-        {phase === "idle" && (
-          <>
-            <div style={{ fontSize:22, fontWeight:800 }}>
-              {mode==="official" ? "Resmi test başlıyor." : test==="tap" ? "Dokunma refleksi." : "Yön refleksi."}
-            </div>
-            <div style={{ opacity:.75, fontSize:14, maxWidth:300 }}>
-              {test==="tap"
-                ? <>Dokun ve bekle. Ekran <b style={{color:"#30E67A"}}>yeşile</b> döndüğü an tekrar dokun.</>
-                : <>Dokun, telefonu düz tut ve bekle. Ok belirdiği an telefonu <b>okun yönüne eğ</b>.{simMode && " (Sim: parmağını o yöne sürükle.)"}</>}
-              {mode==="official" && <> {OFFICIAL_N} deneme; unvanı <b>medyan</b> belirler.</>}
-            </div>
-            <div style={{ marginTop:8, fontFamily:"'Space Mono',monospace", fontSize:13, color: mode==="official" ? "#FFE14D" : "#8EA3FF" }}>▶ BAŞLAT</div>
-          </>
-        )}
+        , !(phase==="go" && test==="tilt") && (
+          React.createElement('div', { style: { width:100, height:100, animation: phase==="armed" ? "blinkArm 1s infinite" : phase==="result" ? "popIn .3s ease-out" : "none" },}
+            , React.createElement(RobotFace, { mood: mood, color: faceColor,})
+          )
+        )
 
-        {phase === "armed" && (
-          <>
-            <div style={{ fontSize:22, fontWeight:800, color:"#FF9B9B" }}>
-              {test==="tap" ? "Bekle..." : "Düz tut, bekle..."}
-            </div>
-            <div style={{ opacity:.7, fontSize:13 }}>
-              {test==="tap" ? "Yeşili görmeden dokunma" : "Ok her an gelebilir"}
-            </div>
-          </>
-        )}
+        , phase === "idle" && (
+          React.createElement(React.Fragment, null
+            , React.createElement('div', { style: { fontSize:22, fontWeight:800 },}
+              , mode==="official" ? "Resmi test başlıyor." : test==="tap" ? "Dokunma refleksi." : "Yön refleksi."
+            )
+            , React.createElement('div', { style: { opacity:.75, fontSize:14, maxWidth:300 },}
+              , test==="tap"
+                ? React.createElement(React.Fragment, null, "Dokun ve bekle. Ekran "    , React.createElement('b', { style: {color:"#30E67A"},}, "yeşile"), " döndüğü an tekrar dokun."    )
+                : React.createElement(React.Fragment, null, "Dokun, telefonu düz tut ve bekle. Ok belirdiği an telefonu "          , React.createElement('b', null, "okun yönüne eğ"  ), ".", simMode && " (Sim: parmağını o yöne sürükle.)")
+              , mode==="official" && React.createElement(React.Fragment, null, " " , OFFICIAL_N, " deneme; unvanı "   , React.createElement('b', null, "medyan"), " belirler." )
+            )
+            , React.createElement('div', { style: { marginTop:8, fontFamily:"'Space Mono',monospace", fontSize:13, color: mode==="official" ? "#FFE14D" : "#8EA3FF" },}, "▶ BAŞLAT" )
+          )
+        )
 
-        {phase === "go" && test==="tap" && (
-          <div style={{ fontSize:34, fontWeight:800, color:"#B8FFD9", letterSpacing:1 }}>DOKUN!</div>
-        )}
+        , phase === "armed" && (
+          React.createElement(React.Fragment, null
+            , React.createElement('div', { style: { fontSize:22, fontWeight:800, color:"#FF9B9B" },}
+              , test==="tap" ? "Bekle..." : "Düz tut, bekle..."
+            )
+            , React.createElement('div', { style: { opacity:.7, fontSize:13 },}
+              , test==="tap" ? "Yeşili görmeden dokunma" : "Ok her an gelebilir"
+            )
+          )
+        )
 
-        {phase === "go" && test==="tilt" && target && (
-          <>
-            <div style={{ fontSize:110, lineHeight:1, color:"#B8FFD9", animation:"popIn .12s ease-out" }}>{DIRS[target].arrow}</div>
-            <div style={{ fontSize:26, fontWeight:800, letterSpacing:3, color:"#B8FFD9" }}>{DIRS[target].label} EĞ!</div>
-          </>
-        )}
+        , phase === "go" && test==="tap" && (
+          React.createElement('div', { style: { fontSize:34, fontWeight:800, color:"#B8FFD9", letterSpacing:1 },}, "DOKUN!")
+        )
 
-        {phase === "early" && (
-          <>
-            <div style={{ fontSize:20, fontWeight:800, color:"#FF9B9B" }}>Erken dokundun!</div>
-            <div style={{ opacity:.75, fontSize:13, maxWidth:260 }}>
-              {mode==="official" ? "Bu deneme sayılmadı — tekrarlanacak." : "100 ms altı tepki insan için imkânsızdır — sen tahmin ettin."}
-            </div>
-            <div style={{ marginTop:8, fontFamily:"'Space Mono',monospace", fontSize:13, color:"#8EA3FF" }}>↻ TEKRAR DENE</div>
-          </>
-        )}
+        , phase === "go" && test==="tilt" && target && (
+          React.createElement(React.Fragment, null
+            , React.createElement('div', { style: { fontSize:110, lineHeight:1, color:"#B8FFD9", animation:"popIn .12s ease-out" },}, DIRS[target].arrow)
+            , React.createElement('div', { style: { fontSize:26, fontWeight:800, letterSpacing:3, color:"#B8FFD9" },}, DIRS[target].label, " EĞ!" )
+          )
+        )
 
-        {phase === "wrong" && (
-          <>
-            <div style={{ fontSize:20, fontWeight:800, color:"#FF9B9B" }}>Yanlış yön!</div>
-            <div style={{ opacity:.75, fontSize:13, maxWidth:280 }}>
-              Hız vardı ama karar yanlıştı — seçimli tepkinin zor kısmı bu.
-              {mode==="official" && " Bu deneme sayılmadı, tekrarlanacak."}
-            </div>
-            <div style={{ marginTop:8, fontFamily:"'Space Mono',monospace", fontSize:13, color:"#8EA3FF" }}>↻ TEKRAR DENE</div>
-          </>
-        )}
+        , phase === "early" && (
+          React.createElement(React.Fragment, null
+            , React.createElement('div', { style: { fontSize:20, fontWeight:800, color:"#FF9B9B" },}, "Erken dokundun!" )
+            , React.createElement('div', { style: { opacity:.75, fontSize:13, maxWidth:260 },}
+              , mode==="official" ? "Bu deneme sayılmadı — tekrarlanacak." : "100 ms altı tepki insan için imkânsızdır — sen tahmin ettin."
+            )
+            , React.createElement('div', { style: { marginTop:8, fontFamily:"'Space Mono',monospace", fontSize:13, color:"#8EA3FF" },}, "↻ TEKRAR DENE"  )
+          )
+        )
 
-        {phase === "result" && tier && (
-          <div style={{ animation:"popIn .3s ease-out", display:"flex", flexDirection:"column", alignItems:"center", gap:6 }}>
-            <div style={{ fontFamily:"'Space Mono',monospace", fontSize:52, fontWeight:700, lineHeight:1, color:tier.color }}>
-              {result}<span style={{ fontSize:20, opacity:.7 }}> ms</span>
-            </div>
-            {mode === "free" ? (
-              <>
-                <div style={{ fontSize:20, fontWeight:800, letterSpacing:2, color:tier.color, border:`2px solid ${tier.color}`, borderRadius:999, padding:"6px 18px", marginTop:4 }}>
-                  {tier.emoji} {tier.name}
-                </div>
-                <div style={{ opacity:.8, fontSize:14, maxWidth:280 }}>{tier.msg}</div>
-                <div style={{ fontFamily:"'Space Mono',monospace", fontSize:12, color:"#8EA3FF", marginTop:2 }}>
-                  İnsanların %{pct < 1 ? pct.toFixed(1) : Math.round(pct)}'inden hızlısın
-                </div>
-              </>
+        , phase === "wrong" && (
+          React.createElement(React.Fragment, null
+            , React.createElement('div', { style: { fontSize:20, fontWeight:800, color:"#FF9B9B" },}, "Yanlış yön!" )
+            , React.createElement('div', { style: { opacity:.75, fontSize:13, maxWidth:280 },}, "Hız vardı ama karar yanlıştı — seçimli tepkinin zor kısmı bu."
+
+              , mode==="official" && " Bu deneme sayılmadı, tekrarlanacak."
+            )
+            , React.createElement('div', { style: { marginTop:8, fontFamily:"'Space Mono',monospace", fontSize:13, color:"#8EA3FF" },}, "↻ TEKRAR DENE"  )
+          )
+        )
+
+        , phase === "result" && tier && (
+          React.createElement('div', { style: { animation:"popIn .3s ease-out", display:"flex", flexDirection:"column", alignItems:"center", gap:6 },}
+            , React.createElement('div', { style: { fontFamily:"'Space Mono',monospace", fontSize:52, fontWeight:700, lineHeight:1, color:tier.color },}
+              , result, React.createElement('span', { style: { fontSize:20, opacity:.7 },}, " ms" )
+            )
+            , mode === "free" ? (
+              React.createElement(React.Fragment, null
+                , React.createElement('div', { style: { fontSize:20, fontWeight:800, letterSpacing:2, color:tier.color, border:`2px solid ${tier.color}`, borderRadius:999, padding:"6px 18px", marginTop:4 },}
+                  , tier.emoji, " " , tier.name
+                )
+                , React.createElement('div', { style: { opacity:.8, fontSize:14, maxWidth:280 },}, tier.msg)
+                , React.createElement('div', { style: { fontFamily:"'Space Mono',monospace", fontSize:12, color:"#8EA3FF", marginTop:2 },}, "İnsanların %"
+                   , pct < 1 ? pct.toFixed(1) : Math.round(pct), "'inden hızlısın"
+                )
+              )
             ) : (
-              <div style={{ opacity:.8, fontSize:14 }}>Kaydedildi — {OFFICIAL_N - S.official.length} deneme kaldı</div>
-            )}
-            <div style={{ marginTop:8, fontFamily:"'Space Mono',monospace", fontSize:13, color:"#8EA3FF" }}>
-              {mode==="official" ? "▶ SONRAKİ DENEME" : "↻ TEKRAR"}
-            </div>
-          </div>
-        )}
-      </div>
-      )}
+              React.createElement('div', { style: { opacity:.8, fontSize:14 },}, "Kaydedildi — "  , OFFICIAL_N - S.official.length, " deneme kaldı"  )
+            )
+            , React.createElement('div', { style: { marginTop:8, fontFamily:"'Space Mono',monospace", fontSize:13, color:"#8EA3FF" },}
+              , mode==="official" ? "▶ SONRAKİ DENEME" : "↻ TEKRAR"
+            )
+          )
+        )
+      )
+      )
 
-      {mode === "free" && S.history.length > 0 && phase !== "certificate" && (
-        <div style={{ marginTop:14, display:"flex", gap:6, flexWrap:"wrap", justifyContent:"center", maxWidth:420 }}>
-          {S.history.map((ms,i)=>{ const t=tierFor(test, ms); return (
-            <div key={i} style={{ fontFamily:"'Space Mono',monospace", fontSize:12, background:"#1A1E3E",
-              border:`1px solid ${t.color}55`, color:t.color, borderRadius:8, padding:"4px 9px" }}>{ms}</div>
-          );})}
-        </div>
-      )}
+      , mode === "free" && S.history.length > 0 && phase !== "certificate" && (
+        React.createElement('div', { style: { marginTop:14, display:"flex", gap:6, flexWrap:"wrap", justifyContent:"center", maxWidth:420 },}
+          , S.history.map((ms,i)=>{ const t=tierFor(test, ms); return (
+            React.createElement('div', { key: i, style: { fontFamily:"'Space Mono',monospace", fontSize:12, background:"#1A1E3E",
+              border:`1px solid ${t.color}55`, color:t.color, borderRadius:8, padding:"4px 9px" },}, ms)
+          );})
+        )
+      )
 
-      <div style={{ marginTop:22, width:"100%", maxWidth:420 }}>
-        <div style={{ fontSize:12, letterSpacing:2, opacity:.55, marginBottom:8, fontFamily:"'Space Mono',monospace" }}>
-          SEVİYELER — {TEST_NAMES[test].toUpperCase()}
-        </div>
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
-          {TIERS.map((t,i)=>{
+      , React.createElement('div', { style: { marginTop:22, width:"100%", maxWidth:420 },}
+        , React.createElement('div', { style: { fontSize:12, letterSpacing:2, opacity:.55, marginBottom:8, fontFamily:"'Space Mono',monospace" },}, "SEVİYELER — "
+            , TEST_NAMES[test].toUpperCase()
+        )
+        , React.createElement('div', { style: { display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 },}
+          , TIERS.map((t,i)=>{
             const lo = i===0 ? 0 : TIERS[i-1].max;
             const label = t.max===Infinity ? `${lo}+ ms` : `${lo}–${t.max} ms`;
             const active = (phase==="certificate" && cert && cert.tier.name===t.name) || (phase==="result" && tier && tier.name===t.name);
             return (
-              <div key={t.name} style={{
+              React.createElement('div', { key: t.name, style: {
                 display:"flex", justifyContent:"space-between", alignItems:"center",
                 background: active ? `${t.color}22` : "#151935",
                 border:`1px solid ${active ? t.color : "#252B52"}`,
                 borderRadius:10, padding:"7px 11px", fontSize:12, transition:"background .3s, border-color .3s",
-              }}>
-                <span style={{ fontWeight:700, color:t.color }}>{t.emoji} {t.name}</span>
-                <span style={{ fontFamily:"'Space Mono',monospace", opacity:.65 }}>{label}</span>
-              </div>
+              },}
+                , React.createElement('span', { style: { fontWeight:700, color:t.color },}, t.emoji, " " , t.name)
+                , React.createElement('span', { style: { fontFamily:"'Space Mono',monospace", opacity:.65 },}, label)
+              )
             );
-          })}
-        </div>
-      </div>
+          })
+        )
+      )
 
-      <div style={{ marginTop:18, textAlign:"center", fontSize:11, opacity:.5, lineHeight:1.6, maxWidth:420 }}>
-        {profile?.consent === "accepted" && profile?.ageRange !== "u18"
+      , React.createElement('div', { style: { marginTop:18, textAlign:"center", fontSize:11, opacity:.5, lineHeight:1.6, maxWidth:420 },}
+        , _optionalChain([profile, 'optionalAccess', _7 => _7.consent]) === "accepted" && _optionalChain([profile, 'optionalAccess', _8 => _8.ageRange]) !== "u18"
           ? "Resmi test sonuçların anonim istatistik olarak gönderilir (kimlik bilgisi içermez)."
-          : "Hiçbir veri gönderilmiyor — sadece oynuyorsun."}
-        {" "}
-        <span onClick={()=>{ clearProfile(); setProfile(null); setSelAge(null); setSelTeam(null); setObStep("consent"); setScreen("onboard"); }}
-          style={{ color:"#8EA3FF", cursor:"pointer", textDecoration:"underline" }}>
-          Onayı sıfırla
-        </span>
-      </div>
-    </div>
+          : "Hiçbir veri gönderilmiyor — sadece oynuyorsun."
+        , " "
+        , React.createElement('span', { onClick: ()=>{ clearProfile(); setProfile(null); setSelAge(null); setSelTeam(null); setObStep("consent"); setScreen("onboard"); },
+          style: { color:"#8EA3FF", cursor:"pointer", textDecoration:"underline" },}, "Onayı sıfırla"
+
+        )
+      )
+    )
   );
 }
-ReactDOM.createRoot(document.getElementById("root")).render(<Reacto />);
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(Reacto, null ));
+
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
